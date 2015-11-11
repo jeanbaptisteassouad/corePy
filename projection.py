@@ -4,7 +4,28 @@ import numpy as np
 import cv2
 import matplotlib.pyplot as plt
 
+
+def projection(img):
+    matrice = cv2.Canny(img, 150, 255, apertureSize=3)
+    height, width = matrice.shape
+    print height, width
+    # ans -> projLignes + projColonnes
+    ans = np.zeros(height + width)
+    for i in range(1, height-1):
+        for j in range(1, width-1):
+            ans[i] += matrice[i][j] * 100.0 / (255*(width-2))
+            ans[j + height] += matrice[i][j] * 100.0 / (255*(height-2))
+            pass
+        pass
+    # plt.plot(ans)
+    # plt.show()
+    pass
+
+
 def main():
+
+    img = cv2.imread('hpc_low/prefix-023.pgm')
+    projection(img)
     # image = Image.open("/Users/jean-baptiste/Desktop/Cafe/test/prefix-056.png")
     # image = image.convert("L")
     # image = image.filter(ImageFilter.FIND_EDGES)
@@ -18,29 +39,23 @@ def main():
     #         pass
     #    pass
 
-    img = cv2.imread('hpc_low/prefix-023.pgm')
-    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    matrice = cv2.Canny(gray, 150, 255, apertureSize=3)
-    height, width = matrice.shape
+    # img = cv2.imread('hpc_low/prefix-023.pgm')
+    # gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    # matrice = cv2.Canny(gray, 150, 255, apertureSize=3)
+    # height, width = matrice.shape
 
-    # On sommes les colonnes et les lignes (on ne prend pas en compte les bords)
-    projLignes = np.zeros(height)
-    projColonnes = np.zeros(width)
-    for i in range(1, height-1):
-        for j in range(1, width-1):
-            projLignes[i] += matrice[i][j] * 100.0 / (255*(width-2))
-            projColonnes[j] += matrice[i][j] * 100.0 / (255*(height-2))
-            pass
-        pass
-    plt.plot(projLignes)
-    plt.show()
-    #print projLignes
-    #print projColonnes
-    # for x in xrange(0, len(projLignes)):
-    #     projLignes[x] *= 100.0 / (255*(width-2))
+    # # On sommes les colonnes et les lignes (on ne prend pas en compte les bords)
+    # projLignes = np.zeros(height)
+    # projColonnes = np.zeros(width)
+    # for i in range(1, height-1):
+    #     for j in range(1, width-1):
+    #         projLignes[i] += matrice[i][j] * 100.0 / (255*(width-2))
+    #         projColonnes[j] += matrice[i][j] * 100.0 / (255*(height-2))
+    #         pass
     #     pass
     # plt.plot(projLignes)
-    #plt.show()
+    # plt.show()
+
 
     # # On fais une moyenne mobile sur projLignes
     # tailleFenetre = 100
