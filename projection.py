@@ -1,21 +1,27 @@
 from PIL import Image
 from PIL import ImageFilter
 import numpy as np
+import cv2
 import matplotlib.pyplot as plt
 
 def main():
-    image = Image.open("prefix-034.png")
-    image = image.convert("L")
-    image = image.filter(ImageFilter.FIND_EDGES)
-    # On convert l'image en array 2D
-    width, height = image.size
-    data = np.array(image.getdata())
-    matrice = np.zeros((height, width))
-    for i in xrange(0, height):
-        for j in xrange(0, width):
-            matrice[i][j] = data[i*width+j]
-            pass
-        pass
+    # image = Image.open("/Users/jean-baptiste/Desktop/Cafe/test/prefix-056.png")
+    # image = image.convert("L")
+    # image = image.filter(ImageFilter.FIND_EDGES)
+    # # On convert l'image en array 2D
+    # width, height = image.size
+    # data = np.array(image.getdata())
+    # matrice = np.zeros((height, width))
+    # for i in xrange(0, height):
+    #     for j in xrange(0, width):
+    #         matrice[i][j] = data[i*width+j]
+    #         pass
+    #    pass
+
+    img = cv2.imread('/Users/jean-baptiste/Desktop/Cafe/test/prefix-056.png')
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    matrice = cv2.Canny(gray, 150, 255, apertureSize=3)
+    height, width = matrice.shape
 
     # On sommes les colonnes et les lignes (on ne prend pas en compte les bords)
     projLignes = np.zeros(height)
@@ -26,6 +32,8 @@ def main():
             projColonnes[j] += matrice[i][j] * 100.0 / (255*(height-2))
             pass
         pass
+    plt.plot(projLignes)
+    plt.show()
     #print projLignes
     #print projColonnes
     # for x in xrange(0, len(projLignes)):
@@ -81,7 +89,6 @@ def main():
     #     projLignes2[x] *= 100.0 / maxWidthProj2
     #     pass
     # plt.plot(projLignes2)
-    plt.show()
 
     #image.show()
     pass
