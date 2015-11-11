@@ -22,16 +22,16 @@ def main():
     projColonnes = np.zeros(width)
     for i in xrange(1, height-1):
         for j in xrange(1, width-1):
-            projLignes[i] += matrice[i][j]
-            projColonnes[j] += matrice[i][j]
+            projLignes[i] += matrice[i][j] * 100.0 / (255*(width-2))
+            projColonnes[j] += matrice[i][j] * 100.0 / (255*(height-2))
             pass
         pass
     #print projLignes
     #print projColonnes
-    for x in xrange(0, len(projLignes)):
-        projLignes[x] *= 100.0 / (255*(width-2))
-        pass
-    plt.plot(projLignes)
+    # for x in xrange(0, len(projLignes)):
+    #     projLignes[x] *= 100.0 / (255*(width-2))
+    #     pass
+    # plt.plot(projLignes)
     #plt.show()
 
     # # On fais une moyenne mobile sur projLignes
