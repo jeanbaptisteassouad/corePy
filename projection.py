@@ -18,7 +18,7 @@ def main():
     #         pass
     #    pass
 
-    img = cv2.imread('/Users/jean-baptiste/Desktop/Cafe/test/prefix-056.png')
+    img = cv2.imread('hpc_low/prefix-023.pgm')
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     matrice = cv2.Canny(gray, 150, 255, apertureSize=3)
     height, width = matrice.shape
@@ -26,8 +26,8 @@ def main():
     # On sommes les colonnes et les lignes (on ne prend pas en compte les bords)
     projLignes = np.zeros(height)
     projColonnes = np.zeros(width)
-    for i in xrange(1, height-1):
-        for j in xrange(1, width-1):
+    for i in range(1, height-1):
+        for j in range(1, width-1):
             projLignes[i] += matrice[i][j] * 100.0 / (255*(width-2))
             projColonnes[j] += matrice[i][j] * 100.0 / (255*(height-2))
             pass
