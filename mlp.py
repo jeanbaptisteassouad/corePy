@@ -17,22 +17,26 @@ with open('pages.pickle', 'rb') as f:
 
 #targets = np.zeros((len(classes),1))
 #training = np.zeros((len(classes),997))
-targets = np.zeros((2, 1))
-training = np.zeros((2, 997))
+targets = np.zeros((10, 2))
+training = np.zeros((10, 997))
+cpt = 0
 
 # size
 nb_examples, data = training.shape
 
 x_test = np.zeros((1,997))
-x_test[:][0] = proj.projection(cv2.imread("hpc_low/-"+pages[25]+".pgm"))
-y_test = np.zeros((1,1))
-y_test[0][0] = classes[25]
+x_test[:][0] = proj.projection(cv2.imread("hpc_low/-"+pages[5]+".pgm"))
+y_test = np.zeros((1,2))
+y_test[0][int(classes[5])] = 1
 
-for i in range(0,2):
+
+
+for i in range(40, 50):
     print("Working on page : "+pages[i]+", class : "+str(classes[i]))
     img = cv2.imread("hpc_low/-"+pages[i]+".pgm")
-    training[:][i] = proj.projection(img)
-    targets[i] = classes[i]
+    training[:][cpt] = proj.projection(img)
+    targets[cpt][int(classes[i])] = 1
+    cpt += 1
 
 
 model = Sequential()
@@ -44,7 +48,7 @@ model.add(Dropout(0.5))
 model.add(Dense(64, init='uniform'))
 model.add(Activation('tanh'))
 model.add(Dropout(0.5))
-model.add(Dense(1, init='uniform'))
+model.add(Dense(2, init='uniform'))
 model.add(Activation('softmax'))
 
 sgd = SGD(lr=0.1, decay=1e-6, momentum=0.9, nesterov=True)
@@ -55,3 +59,4 @@ score = model.evaluate(x_test, y_test, batch_size=16)
 
 print(score)
 print(model.predict_classes(x_test))
+print(model.predict(x_test))
