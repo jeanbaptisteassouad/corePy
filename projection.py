@@ -4,6 +4,7 @@ import numpy as np
 import cv2
 import matplotlib.pyplot as plt
 
+import re
 
 def projection(img):
     matrice = cv2.Canny(img, 150, 255, apertureSize=3)
@@ -24,8 +25,8 @@ def projection(img):
 
 def main():
 
-    img = cv2.imread('hpc_low/prefix-023.pgm')
-    projection(img)
+    # img = cv2.imread('hpc_low/prefix-023.pgm')
+    # projection(img)
     # image = Image.open("/Users/jean-baptiste/Desktop/Cafe/test/prefix-056.png")
     # image = image.convert("L")
     # image = image.filter(ImageFilter.FIND_EDGES)
@@ -43,6 +44,12 @@ def main():
     # gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     # matrice = cv2.Canny(gray, 150, 255, apertureSize=3)
     # height, width = matrice.shape
+
+    string = "hpc-415-c1.png"
+    tmp = re.findall('c[01]', string)
+    number = re.sub('c', "", tmp[0])
+    tmp = re.findall('-.*-', string)
+    page = re.sub('-', "", tmp[0])
 
     # # On sommes les colonnes et les lignes (on ne prend pas en compte les bords)
     # projLignes = np.zeros(height)
