@@ -14,9 +14,16 @@ with open('classes.pickle', 'rb') as f:
     classes = pickle.load(f)
 
 targets = np.zeros((len(classes),1))
-
 training = np.zeros((len(classes),997))
+# size
 nb_examples, data = training.shape
+
+x_test = np.zeros((1,997))
+x_test[:][0] = proj.projection(cv2.imread("hpc_low/-"+str(int(classes[25][0]))+".pgm"))
+y_test = np.zeros((1,1))
+y_test[0][0] = targets[25]
+
+print(str(int(classes[25][0]))+" "+str(classes[25][1]))
 
 for i in range(0,2):
     print("Working on page : "+str(int(classes[i][0]))+", class : "+str(classes[i][1]))
@@ -24,8 +31,6 @@ for i in range(0,2):
     training[:][i] = proj.projection(img)
     targets[i] = classes[i][1]
 
-x_test = proj.projection(cv2.imread("hpc_low/-"+str(int(classes[25][0]))+".pgm"))
-y_test = targets[25]
 
 model = Sequential()
 # Dense(64) is a fully-connected layer with 64 hidden units.
@@ -42,5 +47,8 @@ model.add(Activation('softmax'))
 sgd = SGD(lr=0.1, decay=1e-6, momentum=0.9, nesterov=True)
 model.compile(loss='mean_squared_error', optimizer=sgd)
 
-model.fit(training, classes[:][1], nb_epoch=20, batch_size=16)
+model.fit(training, targets, nb_epoch=20, batch_size=16)
 score = model.evaluate(x_test, y_test, batch_size=16)
+
+print(score)
+print(model.predict_classes(x_test))
