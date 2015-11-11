@@ -9,7 +9,7 @@ import re
 def projection(img):
     matrice = cv2.Canny(img, 150, 255, apertureSize=3)
     height, width = matrice.shape
-    print height, width
+    #print height, width
     # ans -> projLignes + projColonnes
     ans = np.zeros(height + width)
     for i in range(1, height-1):
@@ -20,6 +20,7 @@ def projection(img):
         pass
     # plt.plot(ans)
     # plt.show()
+    return ans
     pass
 
 
