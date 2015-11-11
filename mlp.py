@@ -12,6 +12,8 @@ from keras.optimizers import SGD
 
 with open('classes.pickle', 'rb') as f:
     classes = pickle.load(f)
+with open('pages.pickle', 'rb') as f:
+    pages = pickle.load(f)
 
 #targets = np.zeros((len(classes),1))
 #training = np.zeros((len(classes),997))
@@ -22,17 +24,15 @@ training = np.zeros((2, 997))
 nb_examples, data = training.shape
 
 x_test = np.zeros((1,997))
-x_test[:][0] = proj.projection(cv2.imread("hpc_low/-"+str(int(classes[25][0]))+".pgm"))
+x_test[:][0] = proj.projection(cv2.imread("hpc_low/-"+pages[25]+".pgm"))
 y_test = np.zeros((1,1))
-y_test[0][0] = classes[25][1]
-
-print(str(int(classes[25][0]))+" "+str(classes[25][1]))
+y_test[0][0] = classes[25]
 
 for i in range(0,2):
-    print("Working on page : "+str(int(classes[i][0]))+", class : "+str(classes[i][1]))
-    img = cv2.imread("hpc_low/-"+str(int(classes[i][0]))+".pgm")
+    print("Working on page : "+pages[i]+", class : "+str(classes[i]))
+    img = cv2.imread("hpc_low/-"+pages[i]+".pgm")
     training[:][i] = proj.projection(img)
-    targets[i] = classes[i][1]
+    targets[i] = classes[i]
 
 
 model = Sequential()
