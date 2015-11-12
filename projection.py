@@ -3,31 +3,45 @@ from PIL import ImageFilter
 import numpy as np
 import cv2
 import matplotlib.pyplot as plt
-
+import pickle
 import re
+import sys
+import os
 
+# ans -> projLignes + projColonnes
 def projection(img):
     matrice = cv2.Canny(img, 150, 255, apertureSize=3)
     height, width = matrice.shape
-    #print height, width
-    # ans -> projLignes + projColonnes
     ans = np.zeros(height + width)
     for i in range(1, height-1):
         for j in range(1, width-1):
             ans[i] += matrice[i][j] * 100.0 / (255*(width-2))
             ans[j + height] += matrice[i][j] * 100.0 / (255*(height-2))
-            pass
-        pass
-    # plt.plot(ans)
-    # plt.show()
     return ans
-    pass
 
 
 def main():
 
-    # img = cv2.imread('hpc_low/prefix-023.pgm')
-    # projection(img)
+    # img = cv2.imread('/home/jean-baptiste/Desktop/corePy/pgm/100/HPC-T4-2013-GearsAndSprockets-GB/HPC-T4-2013-GearsAndSprockets-GB-031.pgm')
+    # fichier = open("test.pickle",'w')
+    # pickle.dump( projection(img) , fichier , protocol=2 )
+    # fichier.close()
+
+    if len(sys.argv) != 2:
+        print "ERROR : too few arguments"
+        exit()
+        pass
+    path = "/home/jean-baptiste/Desktop/corePy/pgm/100/HPC-T4-2013-GearsAndSprockets-GB"
+    directoryWithPgm = os.listdir(path)
+
+    for x in range(0,len(directoryWithPgm)):
+        print directoryWithPgm[x]
+        img = cv2.imread(path + "/" + directoryWithPgm[x])
+        fichier = open(path + "/" + re.sub('.pgm', "", directoryWithPgm[x]) + ".pickle",'w')
+        pickle.dump( projection(img) , fichier , protocol=2 )
+        fichier.close()
+        pass
+
     # image = Image.open("/Users/jean-baptiste/Desktop/Cafe/test/prefix-056.png")
     # image = image.convert("L")
     # image = image.filter(ImageFilter.FIND_EDGES)
@@ -46,11 +60,11 @@ def main():
     # matrice = cv2.Canny(gray, 150, 255, apertureSize=3)
     # height, width = matrice.shape
 
-    string = "hpc-415-c1.png"
-    tmp = re.findall('c[01]', string)
-    number = re.sub('c', "", tmp[0])
-    tmp = re.findall('-.*-', string)
-    page = re.sub('-', "", tmp[0])
+    # string = "hpc-415-c1.png"
+    # tmp = re.findall('c[01]', string)
+    # number = re.sub('c', "", tmp[0])
+    # tmp = re.findall('-.*-', string)
+    # page = re.sub('-', "", tmp[0])
 
     # # On sommes les colonnes et les lignes (on ne prend pas en compte les bords)
     # projLignes = np.zeros(height)
