@@ -24,6 +24,8 @@ cpt = 0
 # size
 nb_examples, data = training.shape
 
+print("hpc_low/-"+pages[5]+".pgm")
+
 x_test = np.zeros((1,997))
 x_test[:][0] = proj.projection(cv2.imread("hpc_low/-"+pages[5]+".pgm"))
 y_test = np.zeros((1,2))
