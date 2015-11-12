@@ -10,7 +10,8 @@ import multiprocessing as mp
 
 
 # Dataset for table recognition
-# class implementation :
+# to create data.pickle : d = DataSet(file_dir="dataset/")
+# to load data.pickle and classes.pickle : d = DataSet(data_pickle="data.pickle", classes_pickle="classes.pickle")
 class DataSet(object):
     # constructor
     def __init__(self, data_pickle=None, classes_pickle=None, file_dir=None):
