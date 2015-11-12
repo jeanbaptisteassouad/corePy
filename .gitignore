@@ -3,3 +3,5 @@ hpc_low/*
 mlp_sauv.py
 *.pyc
 pdf/
+pgm/
+
