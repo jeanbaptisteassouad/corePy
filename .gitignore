@@ -4,4 +4,7 @@ mlp_sauv.py
 *.pyc
 pdf/
 pgm/
+dataset/
+
+
 

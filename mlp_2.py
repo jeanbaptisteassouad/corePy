@@ -16,11 +16,11 @@ if datas is not None:
 else:
     dim = -1
 
-training = datas[0:7]
-target = classes[0:7]
+training = datas[0:20]
+target = classes[0:20]
 
-x_test = datas[8:10]
-test_target = classes[8:10]
+x_test = datas[20:30]
+test_target = classes[20:30]
 
 print("Running MLP >>>")
 

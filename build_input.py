@@ -96,4 +96,4 @@ class DataSet(object):
 
 
 dataset_directory = "dataset/"
-input = DataSet(classes_pickle="classes.pickle",data_pickle="data.pickle")
+input = DataSet(classes_pickle="classes.pickle",file_dir="dataset/")

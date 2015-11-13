@@ -15,9 +15,46 @@ def projection(img):
     ans = np.zeros(height + width)
     for i in range(1, height-1):
         for j in range(1, width-1):
-            ans[i] += matrice[i][j] * 100.0 / (255*(width-2))
-            ans[j + height] += matrice[i][j] * 100.0 / (255*(height-2))
+            ans[i] += matrice[i][j]
+            ans[j + height] += matrice[i][j]
     return ans
+
+
+def projection2(img):
+    matrice = cv2.Canny(img, 150, 255, apertureSize=3)
+    height, width = matrice.shape
+    ans = np.zeros(height + width)
+    incr = 0.001
+    coef = incr
+    for i in range(1, height-1):
+        for j in range(1, width-1):
+            if matrice[i][j] == 0:
+                coef = 0
+            else:
+                if coef < 1:
+                    coef += incr
+                    pass
+            pass
+            ans[i] += matrice[i][j] * coef
+            ans[j + height] += matrice[i][j] * coef
+    plt.plot(ans)
+    plt.show()
+    return ans
+
+
+    #incrTmp = 0.001
+    # for i in xrange(1, height-1):
+    #     for j in xrange(1, width-1):
+    #         if matrice[i][j] == 0:
+    #             tmp = 0
+    #         else:
+    #             if tmp < 1:
+    #                 tmp += incrTmp
+    #                 pass
+    #         pass
+    #         projLignes2[i] += matrice[i][j]*tmp
+    #         projColonnes2[j] += matrice[i][j]*tmp
+    #     pass
 
 
 def main():
@@ -27,20 +64,23 @@ def main():
     # pickle.dump( projection(img) , fichier , protocol=2 )
     # fichier.close()
 
-    if len(sys.argv) != 2:
-        print "ERROR : too few arguments"
-        exit()
-        pass
-    path = "/home/jean-baptiste/Desktop/corePy/pgm/100/HPC-T4-2013-GearsAndSprockets-GB"
-    directoryWithPgm = os.listdir(path)
+    # img = cv2.imread('HPC-T4-2013-GearsAndSprockets-GB-038.pgm')
+    # projection2(img)
 
-    for x in range(0,len(directoryWithPgm)):
-        print directoryWithPgm[x]
-        img = cv2.imread(path + "/" + directoryWithPgm[x])
-        fichier = open(path + "/" + re.sub('.pgm', "", directoryWithPgm[x]) + ".pickle",'w')
-        pickle.dump( projection(img) , fichier , protocol=2 )
-        fichier.close()
-        pass
+    # if len(sys.argv) != 2:
+    #     print "ERROR : too few arguments"
+    #     exit()
+    #     pass
+    # path = "/home/jean-baptiste/Desktop/corePy/pgm/100/HPC-T4-2013-GearsAndSprockets-GB"
+    # directoryWithPgm = os.listdir(path)
+
+    # for x in range(0,len(directoryWithPgm)):
+    #     print directoryWithPgm[x]
+    #     img = cv2.imread(path + "/" + directoryWithPgm[x])
+    #     fichier = open(path + "/" + re.sub('.pgm', "", directoryWithPgm[x]) + ".pickle",'w')
+    #     pickle.dump( projection(img) , fichier , protocol=2 )
+    #     fichier.close()
+    #     pass
 
     # image = Image.open("/Users/jean-baptiste/Desktop/Cafe/test/prefix-056.png")
     # image = image.convert("L")
