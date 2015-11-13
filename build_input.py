@@ -8,6 +8,8 @@ import re
 # multiprocessing lib
 import multiprocessing as mp
 
+import projection as proj
+
 
 # Dataset for table recognition
 # to create data.pickle : d = DataSet(file_dir="dataset/")
@@ -82,16 +84,7 @@ class DataSet(object):
     def algorithm(self, pos, img_path):
         # Projection transform
         img = cv2.imread(self.file_dir + img_path)
-        matrice = cv2.Canny(img, 150, 255, apertureSize=3)
-        height, width = matrice.shape
-        # print height, width
-        ans = np.zeros(height + width)
-        for i in range(1, height - 1):
-            for j in range(1, width - 1):
-                ans[i] += matrice[i][j] * 100.0 / (255 * (width - 2))
-                ans[j + height] += matrice[i][j] * 100.0 / (255 * (height - 2))
-                pass
-            pass
+        ans = proj.projection2(img)
         return (pos, img_path, ans)
 
 

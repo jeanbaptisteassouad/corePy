@@ -37,8 +37,6 @@ def projection2(img):
             pass
             ans[i] += matrice[i][j] * coef
             ans[j + height] += matrice[i][j] * coef
-    plt.plot(ans)
-    plt.show()
     return ans
 
 
