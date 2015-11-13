@@ -16,11 +16,11 @@ if datas is not None:
 else:
     dim = -1
 
-training = datas[0:20]
-target = classes[0:20]
+training = datas[0:60]
+target = classes[0:60]
 
-x_test = datas[20:30]
-test_target = classes[20:30]
+x_test = datas[60:90]
+test_target = classes[60:90]
 
 print("Running MLP >>>")
 
@@ -39,7 +39,7 @@ model.add(Activation('softmax'))
 sgd = SGD(lr=0.1, decay=1e-6, momentum=0.9, nesterov=True)
 model.compile(loss='mean_squared_error', optimizer=sgd)
 
-model.fit(training, target, nb_epoch=400, batch_size=200)
+model.fit(training, target, nb_epoch=2000, batch_size=200)
 score = model.evaluate(x_test, test_target, batch_size=200)
 
 print("score : "+str(score))
