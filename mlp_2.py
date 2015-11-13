@@ -39,8 +39,8 @@ model.add(Activation('softmax'))
 sgd = SGD(lr=0.1, decay=1e-6, momentum=0.9, nesterov=True)
 model.compile(loss='mean_squared_error', optimizer=sgd)
 
-model.fit(training, target, nb_epoch=200, batch_size=20)
-score = model.evaluate(x_test, test_target, batch_size=16)
+model.fit(training, target, nb_epoch=400, batch_size=200)
+score = model.evaluate(x_test, test_target, batch_size=200)
 
 print("score : "+str(score))
 print(model.predict_classes(x_test))

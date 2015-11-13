@@ -39,6 +39,30 @@ def projection2(img):
             ans[j + height] += matrice[i][j] * coef
     return ans
 
+def projection3(img):
+    matrice = cv2.Canny(img, 150, 255, apertureSize=3)
+    height, width = matrice.shape
+    ans = np.zeros(height + width)
+    incr = 0.001
+    coef = incr
+    for i in range(1, height-1):
+        for j in range(1, width-1):
+            if matrice[i][j] == 0:
+                coef = 0
+            else:
+                if coef < 1:
+                    coef += incr
+                    pass
+            pass
+            ans[i] += matrice[i][j] * coef
+            ans[j + height] += matrice[i][j] * coef
+    ans = np.histogram(ans, bins=100)[0]
+    for x in range(0, len(ans)):
+        ans[x] *= x
+        pass
+    # plt.plot(ans)
+    # plt.show()
+    return ans
 
     #incrTmp = 0.001
     # for i in xrange(1, height-1):
@@ -62,8 +86,8 @@ def main():
     # pickle.dump( projection(img) , fichier , protocol=2 )
     # fichier.close()
 
-    # img = cv2.imread('HPC-T4-2013-GearsAndSprockets-GB-038.pgm')
-    # projection2(img)
+    img = cv2.imread('HPC-T4-2013-GearsAndSprockets-GB-027.pgm')
+    projection3(img)
 
     # if len(sys.argv) != 2:
     #     print "ERROR : too few arguments"

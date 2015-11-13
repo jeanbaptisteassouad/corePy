@@ -84,7 +84,7 @@ class DataSet(object):
     def algorithm(self, pos, img_path):
         # Projection transform
         img = cv2.imread(self.file_dir + img_path)
-        ans = proj.projection2(img)
+        ans = proj.projection3(img)
         return (pos, img_path, ans)
 
 
