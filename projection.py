@@ -7,10 +7,12 @@ import pickle
 import re
 import sys
 import os
+import math
 
 # ans -> projLignes + projColonnes
 def projection(img):
-    matrice = cv2.Canny(img, 150, 255, apertureSize=3)
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    matrice = cv2.Canny(gray, 150, 255, apertureSize=3)
     height, width = matrice.shape
     ans = np.zeros(height + width)
     for i in range(1, height-1):
@@ -21,7 +23,8 @@ def projection(img):
 
 
 def projection2(img):
-    matrice = cv2.Canny(img, 150, 255, apertureSize=3)
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    matrice = cv2.Canny(gray, 150, 255, apertureSize=3)
     height, width = matrice.shape
     ans = np.zeros(height + width)
     incr = 0.001
@@ -40,7 +43,8 @@ def projection2(img):
     return ans
 
 def projection3(img):
-    matrice = cv2.Canny(img, 150, 255, apertureSize=3)
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    matrice = cv2.Canny(gray, 150, 255, apertureSize=3)
     height, width = matrice.shape
     ans = np.zeros(height + width)
     incr = 0.001
@@ -56,13 +60,125 @@ def projection3(img):
             pass
             ans[i] += matrice[i][j] * coef
             ans[j + height] += matrice[i][j] * coef
-    ans = np.histogram(ans, bins=100)[0]
+    ans = np.histogram(ans, bins=200)[0]
     for x in range(0, len(ans)):
         ans[x] *= x
         pass
     # plt.plot(ans)
     # plt.show()
     return ans
+
+def projection4(img):
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    matrice = cv2.Canny(gray, 150, 255, apertureSize=3)
+    height, width = matrice.shape
+    ans = np.zeros(height + width)
+    for i in range(1, height-1):
+        for j in range(1, width-1):
+            ans[i] += matrice[i][j]
+            ans[j + height] += matrice[i][j]
+    ans = np.histogram(ans, bins=100, range=(0, 255*width))[0]
+    for x in range(0, len(ans)):
+        ans[x] *= x
+        pass
+    # plt.plot(ans)
+    # plt.show()
+    return ans
+
+
+def projectionHist(img):
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    matrice = cv2.Canny(gray, 150, 255, apertureSize=3)
+    features = np.zeros(100*6)
+    height, width = matrice.shape
+    cptFeatures = 0
+    # Blue
+    ans = cv2.calcHist([img], [0], None, [100], [10, 246])
+    for x in range(0, len(ans)):
+        features[cptFeatures] = 100*ans[x][0]/float(height*width)
+        cptFeatures += 1
+        pass
+    # Green
+    ans = cv2.calcHist([img], [1], None, [100], [10, 246])
+    for x in range(0, len(ans)):
+        features[cptFeatures] = 100*ans[x][0]/float(height*width)
+        cptFeatures += 1
+        pass
+    # Red
+    ans = cv2.calcHist([img], [2], None, [100], [10, 246])
+    for x in range(0, len(ans)):
+        features[cptFeatures] = 100*ans[x][0]/float(height*width)
+        cptFeatures += 1
+        pass
+    # # Ligne Horizontal and Vertical
+    # ans = np.zeros(height + width)
+    # for i in range(1, height-1):
+    #     for j in range(1, width-1):
+    #         ans[i] += matrice[i][j]
+    #         ans[j + height] += matrice[i][j]
+    # ans = np.histogram(ans, bins=100, range=(0, 255*width))[0]
+    # threshold = 250.0
+    # for x in range(0, int(100*threshold/width)):
+    #     ans[x] = 0
+    #     pass
+    # for x in range(0, len(ans)):
+    #     features[cptFeatures] = 100*ans[x]/float(width)
+    #     cptFeatures += 1
+    #     pass
+
+    # Ligne Horizontal and Vertical not in the same histo
+    ans = np.zeros(height + width)
+    for i in range(1, height-1):
+        for j in range(1, width-1):
+            ans[i] += matrice[i][j]
+            ans[j + height] += matrice[i][j]
+    threshold = 250.0
+    ##### Horizontal
+    hist = np.histogram(ans[0:height], bins=100, range=(0, 255*width))[0]
+    for x in range(0, int(100*threshold/width)):
+        hist[x] = 0
+        pass
+    for x in range(0, len(hist)):
+        features[cptFeatures] = 100*hist[x]/float(width)
+        cptFeatures += 1
+        pass
+    ##### Vertical
+    hist = np.histogram(ans[height:height + width], bins=100, range=(0, 255*width))[0]
+    for x in range(0, int(100*threshold/height)):
+        hist[x] = 0
+        pass
+    for x in range(0, len(hist)):
+        features[cptFeatures] = 100*hist[x]/float(height)
+        cptFeatures += 1
+        pass
+
+    # # Hole
+    # hori = 0
+    # myBins = 100
+    # ans = np.zeros(myBins)
+    # for i in range(1, height-1):
+    #     hori = 0
+    #     for j in range(1, width-1):
+    #         if matrice[i][j] == 255:
+    #             hori += 1
+    #         else:
+    #             ans[int(100*hori/float(width))] += 1
+    #             hori = 0
+    #     pass
+    # for x in range(0, 5):
+    #     ans[x] = 0
+    #     pass
+    # for x in range(0, len(ans)):
+    #     features[cptFeatures] = ans[x]   # 100*ans[x]/float(height*width)
+    #     cptFeatures += 1
+    #     pass
+
+    # plt.plot(features)
+    # plt.show()
+    return features
+
+
+
 
     #incrTmp = 0.001
     # for i in xrange(1, height-1):
@@ -86,8 +202,13 @@ def main():
     # pickle.dump( projection(img) , fichier , protocol=2 )
     # fichier.close()
 
-    img = cv2.imread('HPC-T4-2013-GearsAndSprockets-GB-027.pgm')
-    projection3(img)
+    img = cv2.imread('HPC-T4-2013-GearsAndSprockets-GB-046.png')
+    projectionHist(img)
+    # img = cv2.imread('HPC-T4-2013-GearsAndSprockets-GB-047.png')
+    # projectionHist(img)
+    # img = cv2.imread('HPC-T4-2013-GearsAndSprockets-GB-048.png')
+    # projectionHist(img)
+    plt.show()
 
     # if len(sys.argv) != 2:
     #     print "ERROR : too few arguments"
