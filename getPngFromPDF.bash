@@ -26,9 +26,9 @@ convertAllPdf()
 	printf '\x1b[0m'
 	# List all the pdf that should be convert
 	convertOnePdf $1 HPC-T4-2013-GearsAndSprockets-GB
-	#convertOnePdf $1 catalogue-direct-transmission-version-6-1-juin-2008-pdf-19-mo-dt-lcat0
-	#convertOnePdf $1 SKF-rolling-bearings-catalogue
-	#convertOnePdf $1 Timken-AP-Bearing-Catalog
+	convertOnePdf $1 catalogue-direct-transmission-version-6-1-juin-2008-pdf-19-mo-dt-lcat0
+	convertOnePdf $1 SKF-rolling-bearings-catalogue
+	convertOnePdf $1 Timken-AP-Bearing-Catalog
 }
 
 # List all the ppi needed

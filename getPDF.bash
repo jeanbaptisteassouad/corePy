@@ -26,9 +26,9 @@ printf '\x1b[0m'
 # HPC
 downloadPDF http://www.hpceurope.com/cat13HPC HPC-T4-2013-GearsAndSprockets-GB
 # Michaud Chailly
-#downloadPDF http://www.michaud-chailly.fr/custom/docs/catalogue/dt catalogue-direct-transmission-version-6-1-juin-2008-pdf-19-mo-dt-lcat0
+downloadPDF http://www.michaud-chailly.fr/custom/docs/catalogue/dt catalogue-direct-transmission-version-6-1-juin-2008-pdf-19-mo-dt-lcat0
 # SKF
-#downloadPDF http://www.skf.com/binary/68-121486 SKF-rolling-bearings-catalogue
+downloadPDF http://www.skf.com/binary/68-121486 SKF-rolling-bearings-catalogue
 # Timken
-#downloadPDF http://www.timken.com/fr-fr/products/Documents Timken-AP-Bearing-Catalog
+downloadPDF http://www.timken.com/fr-fr/products/Documents Timken-AP-Bearing-Catalog
 

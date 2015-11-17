@@ -89,7 +89,26 @@ def projection4(img):
 def projectionHist(img):
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     matrice = cv2.Canny(gray, 150, 255, apertureSize=3)
-    features = np.zeros(100*6)
+    # Ouverture
+    kernel = np.matrix('1; 1; 1')
+    matriceVerti = cv2.erode(matrice, kernel, iterations=10)
+    matriceVerti = cv2.dilate(matriceVerti, kernel, iterations=10)
+    # Fermeture
+    kernel = np.matrix('1 1 1')
+    matriceVerti = cv2.dilate(matriceVerti, kernel, iterations=1)
+    matriceVerti = cv2.erode(matriceVerti, kernel, iterations=1)
+
+    # Ouverture
+    kernel = np.matrix('1 1 1')
+    matriceHori = cv2.erode(matrice, kernel, iterations=10)
+    matriceHori = cv2.dilate(matriceHori, kernel, iterations=10)
+    # Fermeture
+    kernel = np.matrix('1; 1; 1')
+    matriceHori = cv2.dilate(matriceHori, kernel, iterations=1)
+    matriceHori = cv2.erode(matriceHori, kernel, iterations=1)
+    # cv2.imshow('image2', matriceVerti)
+    # cv2.waitKey(0)
+    features = np.zeros(100*5)
     height, width = matrice.shape
     cptFeatures = 0
     # Blue
@@ -110,43 +129,20 @@ def projectionHist(img):
         features[cptFeatures] = 100*ans[x][0]/float(height*width)
         cptFeatures += 1
         pass
-    # # Ligne Horizontal and Vertical
-    # ans = np.zeros(height + width)
-    # for i in range(1, height-1):
-    #     for j in range(1, width-1):
-    #         ans[i] += matrice[i][j]
-    #         ans[j + height] += matrice[i][j]
-    # ans = np.histogram(ans, bins=100, range=(0, 255*width))[0]
-    # threshold = 250.0
-    # for x in range(0, int(100*threshold/width)):
-    #     ans[x] = 0
-    #     pass
-    # for x in range(0, len(ans)):
-    #     features[cptFeatures] = 100*ans[x]/float(width)
-    #     cptFeatures += 1
-    #     pass
-
     # Ligne Horizontal and Vertical not in the same histo
     ans = np.zeros(height + width)
-    for i in range(1, height-1):
-        for j in range(1, width-1):
-            ans[i] += matrice[i][j]
-            ans[j + height] += matrice[i][j]
-    threshold = 250.0
+    for i in range(0, height):
+        for j in range(0, width):
+            ans[i] += matriceHori[i][j]
+            ans[j + height] += matriceVerti[i][j]
     ##### Horizontal
-    hist = np.histogram(ans[0:height], bins=100, range=(0, 255*width))[0]
-    for x in range(0, int(100*threshold/width)):
-        hist[x] = 0
-        pass
+    hist = np.histogram(ans[0:height], bins=100, range=(255, 255*width))[0]
     for x in range(0, len(hist)):
         features[cptFeatures] = 100*hist[x]/float(width)
         cptFeatures += 1
         pass
     ##### Vertical
-    hist = np.histogram(ans[height:height + width], bins=100, range=(0, 255*width))[0]
-    for x in range(0, int(100*threshold/height)):
-        hist[x] = 0
-        pass
+    hist = np.histogram(ans[height:height + width], bins=100, range=(255, 255*height))[0]
     for x in range(0, len(hist)):
         features[cptFeatures] = 100*hist[x]/float(height)
         cptFeatures += 1
