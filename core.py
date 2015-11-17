@@ -293,7 +293,11 @@ def analyseImageByDichotomieInterative(deep, goodProj, frame):
         frameToEval[x] = getNextFrame(frame,x)
         if frameToEval[x][0][0] != -1:
             tableToEval[x] = image[frameToEval[x][0][1]:frameToEval[x][1][1], frameToEval[x][0][0]:frameToEval[x][1][0]]
-            score[x] = scipyDistance.euclidean( proj.projectionHist(tableToEval[x]), goodProj )
+            score[x] = 0
+            for p in range(0,len(goodProj)):
+                score[x] += scipyDistance.euclidean( proj.projectionHist(tableToEval[x]), goodProj[p] )
+                pass
+            score[x] /= float(len(goodProj))
             pass
         pass
     best = score[0]
@@ -323,31 +327,32 @@ def analyseImageByDichotomie(deep, goodProj):
     frame = getNextPreFrame(frame,2)
     frame = getNextPreFrame(frame,3)
     score = 100000
+    bestFrame = 0
+    bestScore = 100000
 
     while True:
         oldFrame = frame
         oldScore = score
         frame, score = analyseImageByDichotomieInterative(deep-1, goodProj, frame)
+        print score
         if oldFrame == frame:
             break
-        if score > oldScore:
-            frame = oldFrame
-            break
+        if score < bestScore:
+            bestScore = score
+            bestFrame = frame
 
-    table = image[frame[0][1]:frame[1][1], frame[0][0]:frame[1][0]]
+
+    table = image[bestFrame[0][1]:bestFrame[1][1], bestFrame[0][0]:bestFrame[1][0]]
     cv2.imshow('image', table)
     cv2.waitKey(0)
 
     return frame
 
-
-def main():
+def training(path):
     global image
     global cropRectPoints
-    global gray
-    image = cv2.imread('core/test.png')
+    image = cv2.imread(path)
     cv2.namedWindow('image')
-
     cv2.setMouseCallback('image', click_and_crop)
     cv2.imshow('image',image)
     cropRectPoints = []
@@ -357,11 +362,39 @@ def main():
           exit()
     cv2.setMouseCallback('image',dummyCallBack)
     table = apply_crop()
-    # cv2.imshow('image', table)
-    # cv2.waitKey(0)
-    goodProj = proj.projectionHist(table)
+    Proj = proj.projectionHist(table)
+    return Proj
 
-    # image = cv2.imread('core/test+.png')
+
+def main():
+    global image
+    global cropRectPoints
+    global gray
+    # image = cv2.imread('core/test.png')
+    # cv2.namedWindow('image')
+
+    # cv2.setMouseCallback('image', click_and_crop)
+    # cv2.imshow('image',image)
+    # cropRectPoints = []
+    # while (len(cropRectPoints) != 2):
+    #   keyPressed = cv2.waitKey(0)
+    #   if keyPressed == 1048603:
+    #       exit()
+    # cv2.setMouseCallback('image',dummyCallBack)
+    # table = apply_crop()
+    # # cv2.imshow('image', table)
+    # # cv2.waitKey(0)
+    # goodProj = proj.projectionHist(table)
+
+    goodProj = []
+    goodProj += [training('core/hpc1.png')]
+    goodProj += [training('core/hpc2.png')]
+    goodProj += [training('core/hpc3.png')]
+    goodProj += [training('core/hpc4.png')]
+    goodProj += [training('core/hpc5.png')]
+
+
+    image = cv2.imread('core/test.png')
     analyseImageByDichotomie(0,goodProj)
 
     cv2.destroyAllWindows()
@@ -375,3 +408,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+
