@@ -319,6 +319,7 @@ def analyseImageByDichotomieInterative(deep, goodProj, frame):
 
 
 def analyseImageByDichotomie(deep, goodProj):
+    global image
     height,width,channel = image.shape
     prepareImageGray()
     frame = [(0,0) , (width-1,height-1)]
@@ -366,6 +367,73 @@ def training(path):
     return Proj
 
 
+def newDichotomieRecursive(deep,frame):
+    if deep <= 0:
+        return [frame]
+
+    sumLine = np.zeros(frame[1][1]+1 - frame[0][1])
+    sumCol = np.zeros(frame[1][0]+1 - frame[0][0])
+    for y in range(frame[0][1],frame[1][1]+1):
+        for x in range(frame[0][0],frame[1][0]+1):
+            sumLine[y-frame[0][1]] += gray[y][x]
+            sumCol[x-frame[0][0]] += gray[y][x]
+            pass
+        pass
+
+    noMoreOne = True
+    pointLine = []
+    for i in range(0,len(sumLine)):
+        if sumLine[i] < (frame[1][0]+1 - frame[0][0])*255:
+            if noMoreOne:
+                noMoreOne = False
+                pointLine.append( i-1 + frame[0][1])
+                pass
+            pass
+        elif not noMoreOne:
+            noMoreOne = True
+            pointLine.append( i + frame[0][1])
+
+    noMoreOne = True
+    pointCol = []
+    for i in range(0,len(sumCol)):
+        if sumCol[i] < (frame[1][1]+1 - frame[0][1])*255:
+            if noMoreOne:
+                noMoreOne = False
+                pointCol.append( i-1 + frame[0][0])
+                pass
+            pass
+        elif not noMoreOne:
+            noMoreOne = True
+            pointCol.append( i + frame[0][0])
+
+    dichoArray = []
+    for y in range(0,len(pointLine)/2):
+        for x in range(0,len(pointCol)/2):
+            dichoArray.append( [(pointCol[2*x],pointLine[2*y]),(pointCol[2*x+1],pointLine[2*y+1])] )
+            pass
+        pass
+
+    if len(dichoArray) == 1 and dichoArray[0] == frame:
+        return [frame]
+
+    ans = []
+    for x in range(0,len(dichoArray)):
+        ans += newDichotomieRecursive(deep-1,dichoArray[x])
+        pass
+
+    return ans
+
+
+def newDichotomie(deep):
+    global image
+    height,width,channel = image.shape
+
+    prepareImageGray()
+    frame = [(0,0) , (width-1,height-1)]
+
+    return newDichotomieRecursive(deep,frame)
+
+
 def main():
     global image
     global cropRectPoints
@@ -386,25 +454,33 @@ def main():
     # # cv2.waitKey(0)
     # goodProj = proj.projectionHist(table)
 
-    goodProj = []
-    goodProj += [training('core/hpc1.png')]
-    goodProj += [training('core/hpc2.png')]
-    goodProj += [training('core/hpc3.png')]
-    goodProj += [training('core/hpc4.png')]
-    goodProj += [training('core/hpc5.png')]
+    # goodProj = []
+    # goodProj += [training('core/test4.png')]
+    # goodProj += [training('core/hpc2.png')]
+    # goodProj += [training('core/hpc3.png')]
+    # goodProj += [training('core/hpc4.png')]
+    # goodProj += [training('core/hpc5.png')]
 
 
-    image = cv2.imread('core/test.png')
-    analyseImageByDichotomie(0,goodProj)
+    # image = cv2.imread('core/test4.png')
+    # analyseImageByDichotomie(0,goodProj)
 
-    cv2.destroyAllWindows()
-    pass
+    # cv2.destroyAllWindows()
+    # pass
 
 
     # displayDichoArray( dichotomieMultiProcessor(3) )
     # cv2.imshow('image',image)
     # cv2.waitKey(0)
     # cv2.destroyAllWindows()
+
+
+    image = cv2.imread('core/test4.png')
+    cv2.namedWindow('image')
+    displayDichoArray( newDichotomie(10) )
+    cv2.imshow('image',image)
+    cv2.waitKey(0)
+
 
 if __name__ == '__main__':
     main()
