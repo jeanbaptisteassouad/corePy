@@ -10,6 +10,9 @@ cropRectPoints = []
 cropping = False
 image = 0
 gray = 0
+potentialRegionOfInterest = []
+potentialRegionOfInterestIsSelected = []
+
 
 def click_and_crop(event, x, y, flags, param):
     # grab references to the global variables
@@ -433,11 +436,87 @@ def newDichotomie(deep):
 
     return newDichotomieRecursive(deep,frame)
 
+def isMouseInsideFrame(frame,x,y):
+    if x < frame[0][0] or y < frame[0][1]:
+        return False
+    if x > frame[1][0] or y > frame[1][1]:
+        return False
+    return True
+
+def mouseIsInAPotentialRegionOfInterest(x,y):
+    global potentialRegionOfInterest
+    for i in range(0,len(potentialRegionOfInterest)):
+        if isMouseInsideFrame(potentialRegionOfInterest[i],x,y):
+            return True, i
+            pass
+        pass
+    return False, -1
+
+
+def addColorFrame(imageTmp,frame,b,g,r):
+    height,width,channel = imageTmp.shape
+    for y in range(frame[0][1],frame[1][1]):
+        for x in range(frame[0][0],frame[1][0]):
+            imageTmp[y][x][0] += b
+            imageTmp[y][x][0] += g
+            imageTmp[y][x][0] += r
+            pass
+        pass
+    return imageTmp
+
+def coloringRegionOfInterestSelected(imageTmp):
+    global potentialRegionOfInterest , potentialRegionOfInterestIsSelected
+    for x in range(0,len(potentialRegionOfInterest)):
+        if potentialRegionOfInterestIsSelected[x]:
+            imageTmp = addColorFrame(imageTmp,potentialRegionOfInterest[x],20,20,20)
+            pass
+        pass
+    return imageTmp
+
+
+def selectRegionOfInterest(event, x, y, flags, param):
+    # grab references to the global variables
+    global image, potentialRegionOfInterestIsSelected
+
+    # if the left mouse button was clicked, record the starting
+    # (x, y) coordinates and indicate that cropping is being
+    # performed
+    if event == cv2.EVENT_LBUTTONDOWN:
+        pass
+
+    # check to see if the left mouse button was released
+    elif event == cv2.EVENT_LBUTTONUP:
+        boolean, indice = mouseIsInAPotentialRegionOfInterest(x,y)
+        if boolean:
+            imageTmp = image.copy()
+            if potentialRegionOfInterestIsSelected[indice]:
+                potentialRegionOfInterestIsSelected[indice] = False
+            else:
+                potentialRegionOfInterestIsSelected[indice] = True
+                pass
+            imageTmp = image.copy()
+            imageTmp = coloringRegionOfInterestSelected(imageTmp)
+            cv2.imshow("image", imageTmp)
+            pass
+
+
+    if event == cv2.EVENT_MOUSEMOVE:
+        # boolean, frame = mouseIsInAPotentialRegionOfInterest
+        # haveLeave = True
+        # if boolean and haveLeave:
+        #     highlightPotentialRegionOfInterest(frame)
+        #     haveLeave = False
+        # else:
+        #     haveLeave = True
+        pass
+
 
 def main():
     global image
     global cropRectPoints
     global gray
+    global potentialRegionOfInterest
+    global potentialRegionOfInterestIsSelected
     # image = cv2.imread('core/test.png')
     # cv2.namedWindow('image')
 
@@ -469,17 +548,84 @@ def main():
     # pass
 
 
+
+
     # displayDichoArray( dichotomieMultiProcessor(3) )
     # cv2.imshow('image',image)
     # cv2.waitKey(0)
     # cv2.destroyAllWindows()
 
 
-    image = cv2.imread('core/test4.png')
+
+
+    image = cv2.imread('core/test5.png')
     cv2.namedWindow('image')
     displayDichoArray( newDichotomie(10) )
     cv2.imshow('image',image)
     cv2.waitKey(0)
+
+
+
+
+    # # Premiere Image, on selection les ROIs
+    # image = cv2.imread('core/test6.png')
+    # cv2.namedWindow('image')
+    # cv2.setMouseCallback('image', selectRegionOfInterest)
+    # potentialRegionOfInterest = newDichotomie(10)
+    # potentialRegionOfInterestIsSelected = []
+    # for x in range(0,len(potentialRegionOfInterest)):
+    #     potentialRegionOfInterestIsSelected.append( False )
+    #     pass
+    # displayDichoArray( potentialRegionOfInterest )
+    # cv2.imshow('image',image)
+    # cv2.waitKey(0)
+    # regionOfInterest = []
+    # for x in range(0,len(potentialRegionOfInterest)):
+    #     if potentialRegionOfInterestIsSelected[x]:
+    #         regionOfInterest.append( potentialRegionOfInterest[x] )
+    #         pass
+
+    # # On calcule les projections des ROIs
+    # goodProj = []
+    # for x in range(0,len(regionOfInterest)):
+    #     table = image[regionOfInterest[x][0][1]:regionOfInterest[x][1][1], regionOfInterest[x][0][0]:regionOfInterest[x][1][0]]
+    #     goodProj += [proj.projectionHist(table)]
+    #     pass
+
+    # # On charge une nouvelle image et on preselectionne les ROIs
+    # image = cv2.imread('core/test5.png')
+    # potentialRegionOfInterest = newDichotomie(10)
+    # potentialRegionOfInterestIsSelected = []
+    # for x in range(0,len(potentialRegionOfInterest)):
+    #     potentialRegionOfInterestIsSelected.append( False )
+    #     pass
+    # displayDichoArray( potentialRegionOfInterest )
+    # score = []
+    # for x in range(0,len(potentialRegionOfInterest)):
+    #     tmp = 0
+    #     for p in range(0,len(goodProj)):
+    #         table = image[potentialRegionOfInterest[x][0][1]:potentialRegionOfInterest[x][1][1], potentialRegionOfInterest[x][0][0]:potentialRegionOfInterest[x][1][0]]
+    #         tmp += scipyDistance.euclidean( proj.projectionHist(table), goodProj[p] )
+    #         pass
+    #     score.append( tmp / float(len(goodProj)) )
+    #     pass
+
+    # bestScore = 100000
+    # indBestScore = -1
+
+    # for x in range(0,len(score)):
+    #     if bestScore > score[x]:
+    #         bestScore = score[x]
+    #         indBestScore = x
+    #         pass
+    #     pass
+
+    # potentialRegionOfInterestIsSelected[indBestScore] = True
+    # imageTmp = image.copy()
+    # imageTmp = coloringRegionOfInterestSelected(imageTmp)
+    # cv2.imshow("image", imageTmp)
+    # cv2.waitKey(0)
+
 
 
 if __name__ == '__main__':
