@@ -510,6 +510,87 @@ def selectRegionOfInterest(event, x, y, flags, param):
         #     haveLeave = True
         pass
 
+def newDichotomieOneStepForExtractTable(gray):
+    height,width = gray.shape
+
+    frame = [(0,0) , (width-1,height-1)]
+
+
+    sumLine = np.zeros(frame[1][1]+1 - frame[0][1])
+    sumCol = np.zeros(frame[1][0]+1 - frame[0][0])
+    for y in range(frame[0][1],frame[1][1]+1):
+        for x in range(frame[0][0],frame[1][0]+1):
+            sumLine[y-frame[0][1]] += gray[y][x]
+            sumCol[x-frame[0][0]] += gray[y][x]
+            pass
+        pass
+
+    noMoreOne = True
+    pointLine = []
+    for i in range(0,len(sumLine)):
+        if sumLine[i] < (frame[1][0]+1 - frame[0][0])*255:
+            if noMoreOne:
+                noMoreOne = False
+                pointLine.append( i-1 + frame[0][1])
+                pass
+            pass
+        elif not noMoreOne:
+            noMoreOne = True
+            pointLine.append( i + frame[0][1])
+
+    noMoreOne = True
+    pointCol = []
+    for i in range(0,len(sumCol)):
+        if sumCol[i] < (frame[1][1]+1 - frame[0][1])*255:
+            if noMoreOne:
+                noMoreOne = False
+                pointCol.append( i-1 + frame[0][0])
+                pass
+            pass
+        elif not noMoreOne:
+            noMoreOne = True
+            pointCol.append( i + frame[0][0])
+
+    dichoArray = []
+    for y in range(0,len(pointLine)/2):
+        for x in range(0,len(pointCol)/2):
+            dichoArray.append( [(pointCol[2*x],pointLine[2*y]),(pointCol[2*x+1],pointLine[2*y+1])] )
+            pass
+        pass
+
+    return dichoArray
+
+def displayDichoArrayInGray(dichoArray):
+    global gray
+    for x in range(0,len(dichoArray)):
+        cv2.rectangle(gray, dichoArray[x][0], dichoArray[x][1], 0, 1)
+        pass
+    pass
+
+def extractContentTable():
+    global image, gray
+    height,width,channel = image.shape
+    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    for y in range(0,height):
+        for x in range(0,width):
+            if gray[y][x] > 50:
+                gray[y][x] = 255
+            else:
+                gray[y][x] = 0
+            pass
+        pass
+    kernel = np.matrix('1 1 1')
+    grayHori = cv2.dilate(gray, kernel, iterations=10)
+    grayHori = cv2.erode(grayHori, kernel, iterations=10)
+    for y in range(0,height):
+        for x in range(0,width):
+            gray[y][x] -= grayHori[y][x] - 255
+        pass
+
+    displayDichoArrayInGray( newDichotomieOneStepForExtractTable(gray) )
+    cv2.imshow('image',gray)
+    cv2.waitKey(0)
+    pass
 
 def main():
     global image
@@ -558,17 +639,16 @@ def main():
 
 
 
-    image = cv2.imread('core/test5.png')
-    cv2.namedWindow('image')
-    displayDichoArray( newDichotomie(10) )
-    cv2.imshow('image',image)
-    cv2.waitKey(0)
-
+    # image = cv2.imread('core/test5.png')
+    # cv2.namedWindow('image')
+    # displayDichoArray( newDichotomie(10) )
+    # cv2.imshow('image',image)
+    # cv2.waitKey(0)
 
 
 
     # # Premiere Image, on selection les ROIs
-    # image = cv2.imread('core/test6.png')
+    # image = cv2.imread('core/test.png')
     # cv2.namedWindow('image')
     # cv2.setMouseCallback('image', selectRegionOfInterest)
     # potentialRegionOfInterest = newDichotomie(10)
@@ -593,7 +673,7 @@ def main():
     #     pass
 
     # # On charge une nouvelle image et on preselectionne les ROIs
-    # image = cv2.imread('core/test5.png')
+    # image = cv2.imread('core/test.png')
     # potentialRegionOfInterest = newDichotomie(10)
     # potentialRegionOfInterestIsSelected = []
     # for x in range(0,len(potentialRegionOfInterest)):
@@ -624,6 +704,14 @@ def main():
     # imageTmp = image.copy()
     # imageTmp = coloringRegionOfInterestSelected(imageTmp)
     # cv2.imshow("image", imageTmp)
+    # cv2.waitKey(0)
+
+
+
+    image = cv2.imread('core/table.png')
+    cv2.namedWindow('image')
+    extractContentTable()
+    # cv2.imshow('image',gray)
     # cv2.waitKey(0)
 
 
