@@ -387,14 +387,14 @@ def main():
     # goodProj = proj.projectionHist(table)
 
     goodProj = []
-    goodProj += [training('core/hpc1.png')]
-    goodProj += [training('core/hpc2.png')]
-    goodProj += [training('core/hpc3.png')]
-    goodProj += [training('core/hpc4.png')]
-    goodProj += [training('core/hpc5.png')]
+    goodProj += [training('core/test.png')]
+    #goodProj += [training('core/hpc2.png')]
+    #goodProj += [training('core/hpc3.png')]
+    #goodProj += [training('core/hpc4.png')]
+    #goodProj += [training('core/hpc5.png')]
 
 
-    image = cv2.imread('core/test.png')
+    image = cv2.imread('core/bad.png')
     analyseImageByDichotomie(0,goodProj)
 
     cv2.destroyAllWindows()
