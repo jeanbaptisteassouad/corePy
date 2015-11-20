@@ -131,7 +131,7 @@ def projection_histogram(img):
 
 
 def main():
-    base = "test"
+    base = "core/table"
     ext="png"
     filename = base+"."+ext
 

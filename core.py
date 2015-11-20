@@ -614,16 +614,16 @@ def main():
     # # cv2.waitKey(0)
     # goodProj = proj.projectionHist(table)
 
-    goodProj = []
-    goodProj += [training('core/test.png')]
-    #goodProj += [training('core/hpc2.png')]
-    #goodProj += [training('core/hpc3.png')]
-    #goodProj += [training('core/hpc4.png')]
-    #goodProj += [training('core/hpc5.png')]
+    # goodProj = []
+    # goodProj += [training('core/test.png')]
+    # goodProj += [training('core/hpc2.png')]
+    # goodProj += [training('core/hpc3.png')]
+    # goodProj += [training('core/hpc4.png')]
+    # goodProj += [training('core/hpc5.png')]
 
 
-    image = cv2.imread('core/bad.png')
-    analyseImageByDichotomie(0,goodProj)
+    # image = cv2.imread('core/bad.png')
+    # analyseImageByDichotomie(0,goodProj)
     # goodProj = []
     # goodProj += [training('core/test4.png')]
     # goodProj += [training('core/hpc2.png')]
@@ -646,11 +646,11 @@ def main():
 
 
 
-    # image = cv2.imread('core/test5.png')
-    # cv2.namedWindow('image')
-    # displayDichoArray( newDichotomie(10) )
-    # cv2.imshow('image',image)
-    # cv2.waitKey(0)
+    image = cv2.imread('core/test5.png')
+    cv2.namedWindow('image')
+    displayDichoArray( newDichotomie(10) )
+    cv2.imshow('image',image)
+    cv2.waitKey(0)
 
 
 
@@ -715,9 +715,9 @@ def main():
 
 
 
-    image = cv2.imread('core/table.png')
-    cv2.namedWindow('image')
-    extractContentTable()
+    # image = cv2.imread('core/table.png')
+    # cv2.namedWindow('image')
+    # extractContentTable()
     # cv2.imshow('image',gray)
     # cv2.waitKey(0)
 
