@@ -1,9 +1,9 @@
 import pickle
 
-class Mlp(Predictor):
-	"""docstring for Mlp"""
+class Kppv(Predictor):
+	"""docstring for Kppv"""
 	def __init__(self):
-		super(Mlp, self).__init__()
+		super(Kppv, self).__init__()
 
 	def train():
 		pass
