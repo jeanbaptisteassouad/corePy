@@ -1,9 +1,11 @@
-
+import numpy as np
 
 class Predictor(object):
 	"""docstring for Predictor"""
-	def __init__(self, arg):
+	def __init__(self):
 		super(Predictor, self).__init__()
-		self.datas =
-		self.classes =
+		self.datas = np.zeros( (0,500) )
+		self.classes = np.zeros( (0,2) )
+		self.is_train_once = False
+
 

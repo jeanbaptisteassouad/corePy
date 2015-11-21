@@ -28,25 +28,25 @@ class Feature(object):
         kernel = np.matrix('1; 1; 1')
         matriceHori = self.__fermeture(matriceHori,kernel,1)
 
-        # cv2.imshow('image2', matriceHori)
+        # cv2.imshow('image', matriceHori)
         # cv2.waitKey(0)
         features = np.zeros(100*5)
         height, width = matrice.shape
         cptFeatures = 0
         # Blue
-        ans = cv2.calcHist([img], [0], None, [100], [10, 246])
+        ans = cv2.calcHist([img], [0], None, [100], [20, 236])
         for x in range(0, len(ans)):
             features[cptFeatures] = 100*ans[x][0]/float(height*width)
             cptFeatures += 1
             pass
         # Green
-        ans = cv2.calcHist([img], [1], None, [100], [10, 246])
+        ans = cv2.calcHist([img], [1], None, [100], [20, 236])
         for x in range(0, len(ans)):
             features[cptFeatures] = 100*ans[x][0]/float(height*width)
             cptFeatures += 1
             pass
         # Red
-        ans = cv2.calcHist([img], [2], None, [100], [10, 246])
+        ans = cv2.calcHist([img], [2], None, [100], [20, 236])
         for x in range(0, len(ans)):
             features[cptFeatures] = 100*ans[x][0]/float(height*width)
             cptFeatures += 1
