@@ -81,7 +81,7 @@ class CorePy(object):
 def main():
     F = Feature()
     C = Content()
-    M = Mlp()
+    # M = Mlp()
     K = Kppv()
     Core = CorePy("",K)
 
@@ -208,10 +208,94 @@ def main():
     cv2.setMouseCallback('image', Core.dummyCallBack)
     Core.training_predictor()
 
+    print "SWAG"
+    Core.image_current = ImageFactory("core/bad3.png",F.projection_histogram,C.new_leuven_dichotomie)
+    Core.image_current.extract_feature_for_all_content()
+    Core.predict_classes_content_image_current()
+    Core.image_current.drawing_image_cv2()
+    cv2.namedWindow('image')
+    cv2.setMouseCallback('image', Core.selectRegionOfInterest)
+    cv2.imshow('image', Core.image_current.image_display)
+    cv2.waitKey(0)
+    cv2.setMouseCallback('image', Core.dummyCallBack)
+    Core.training_predictor()
+
+    print "SWAG"
+    Core.image_current = ImageFactory("core/hpc9.png",F.projection_histogram,C.new_leuven_dichotomie)
+    Core.image_current.extract_feature_for_all_content()
+    Core.predict_classes_content_image_current()
+    Core.image_current.drawing_image_cv2()
+    cv2.namedWindow('image')
+    cv2.setMouseCallback('image', Core.selectRegionOfInterest)
+    cv2.imshow('image', Core.image_current.image_display)
+    cv2.waitKey(0)
+    cv2.setMouseCallback('image', Core.dummyCallBack)
+    Core.training_predictor()
+
+    print "SWAG"
+    Core.image_current = ImageFactory("core/hpc10.png",F.projection_histogram,C.new_leuven_dichotomie)
+    Core.image_current.extract_feature_for_all_content()
+    Core.predict_classes_content_image_current()
+    Core.image_current.drawing_image_cv2()
+    cv2.namedWindow('image')
+    cv2.setMouseCallback('image', Core.selectRegionOfInterest)
+    cv2.imshow('image', Core.image_current.image_display)
+    cv2.waitKey(0)
+    cv2.setMouseCallback('image', Core.dummyCallBack)
+    Core.training_predictor()
+
+    print "SWAG"
+    Core.image_current = ImageFactory("core/hpc11.png",F.projection_histogram,C.new_leuven_dichotomie)
+    Core.image_current.extract_feature_for_all_content()
+    Core.predict_classes_content_image_current()
+    Core.image_current.drawing_image_cv2()
+    cv2.namedWindow('image')
+    cv2.setMouseCallback('image', Core.selectRegionOfInterest)
+    cv2.imshow('image', Core.image_current.image_display)
+    cv2.waitKey(0)
+    cv2.setMouseCallback('image', Core.dummyCallBack)
+    Core.training_predictor()
+
+    print "SWAG"
+    Core.image_current = ImageFactory("core/hpc12.png",F.projection_histogram,C.new_leuven_dichotomie)
+    Core.image_current.extract_feature_for_all_content()
+    Core.predict_classes_content_image_current()
+    Core.image_current.drawing_image_cv2()
+    cv2.namedWindow('image')
+    cv2.setMouseCallback('image', Core.selectRegionOfInterest)
+    cv2.imshow('image', Core.image_current.image_display)
+    cv2.waitKey(0)
+    cv2.setMouseCallback('image', Core.dummyCallBack)
+    Core.training_predictor()
+
+    print "SWAG"
+    Core.image_current = ImageFactory("core/hpc13.png",F.projection_histogram,C.new_leuven_dichotomie)
+    Core.image_current.extract_feature_for_all_content()
+    Core.predict_classes_content_image_current()
+    Core.image_current.drawing_image_cv2()
+    cv2.namedWindow('image')
+    cv2.setMouseCallback('image', Core.selectRegionOfInterest)
+    cv2.imshow('image', Core.image_current.image_display)
+    cv2.waitKey(0)
+    cv2.setMouseCallback('image', Core.dummyCallBack)
+    Core.training_predictor()
+
+    print "SWAG"
+    Core.image_current = ImageFactory("core/hpc14.png",F.projection_histogram,C.new_leuven_dichotomie)
+    Core.image_current.extract_feature_for_all_content()
+    Core.predict_classes_content_image_current()
+    Core.image_current.drawing_image_cv2()
+    cv2.namedWindow('image')
+    cv2.setMouseCallback('image', Core.selectRegionOfInterest)
+    cv2.imshow('image', Core.image_current.image_display)
+    cv2.waitKey(0)
+    cv2.setMouseCallback('image', Core.dummyCallBack)
+    Core.training_predictor()
+
     pass
 
 if __name__ == '__main__':
-    from Mlp import Mlp
+    # from Mlp import Mlp
     from Kppv import Kppv
     from ImageFactory import ImageFactory
     from Feature import Feature

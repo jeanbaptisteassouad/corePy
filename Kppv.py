@@ -7,7 +7,7 @@ class Kppv(Predictor):
     """docstring for Kppv"""
     def __init__(self):
         super(Kppv, self).__init__()
-        self.k = 4
+        self.k = 1
 
     def train(self, datas, classes):
         new_datas = np.resize( self.datas, (len(self.datas)+len(datas),500) )
