@@ -42,15 +42,21 @@ class Kppv(Predictor):
                 tot += self.classes[indice[x]][1]
             tot /= len(indice)
             if tot > 0.5:
-                return (0,1)
+                return (0,1) , score[0][0]
             else:
-                return (1,0)
+                return (1,0) , -1
         else:
-            return (1,0)
+            return (1,0) , -1
         pass
 
-    def serialize():
+    def serialize(self):
+        f = open('kppv.pickle', 'wb')
+        pickle.dump((self.datas , self.classes), f, protocol=2)
+        f.close()
         pass
 
-    def deserialize():
+    def deserialize(self):
+        f = open('kppv.pickle', 'rb')
+        self.datas , self.classes = pickle.load(f)
+        f.close()
         pass

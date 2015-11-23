@@ -8,14 +8,17 @@ class CorePy(object):
         self.image_current = None
         self.path = path
         self.predictor = predictor
+        self.max_distance_kppv = 0
 
-    def predict_classes_content_image_current(self):
+    def training_predict_classes_current(self):
         prediction_classes = np.zeros( (len(self.image_current.list_feature),2) )
         tot = 0
         for x in range(0,len(self.image_current.list_feature)):
-            prediction_classes[x] = self.predictor.predict( self.image_current.list_feature[x] )
+            prediction_classes[x] , distance = self.predictor.predict( self.image_current.list_feature[x] )
             tot += prediction_classes[x]
-            pass
+            if distance >= 0:
+                self.max_distance_kppv = max(self.max_distance_kppv,distance)
+        print self.max_distance_kppv
         print tot
         self.image_current.list_classes = prediction_classes
 
@@ -30,7 +33,7 @@ class CorePy(object):
 
 
 
-
+    # A refaire, provisoire
     def isMouseInsideFrame(self,frame,x,y):
         if x < frame[0][0] or y < frame[0][1]:
             return False
@@ -77,6 +80,20 @@ class CorePy(object):
         pass
 
 
+def functionTest(path,Core,F,C):
+    print "SWAG"
+    Core.image_current = ImageFactory(path,F.projection_histogram,C.new_leuven_dichotomie)
+    Core.image_current.extract_feature_for_all_content()
+    Core.training_predict_classes_current()
+    Core.image_current.drawing_image_cv2()
+    cv2.namedWindow('image')
+    cv2.setMouseCallback('image', Core.selectRegionOfInterest)
+    cv2.imshow('image', Core.image_current.image_display)
+    cv2.waitKey(0)
+    cv2.setMouseCallback('image', Core.dummyCallBack)
+    Core.training_predictor()
+    pass
+
 
 def main():
     F = Feature()
@@ -85,212 +102,30 @@ def main():
     K = Kppv()
     Core = CorePy("",K)
 
-    print "SWAG"
-    Core.image_current = ImageFactory("core/test.png",F.projection_histogram,C.new_leuven_dichotomie)
-    Core.image_current.extract_feature_for_all_content()
-    Core.predict_classes_content_image_current()
-    Core.image_current.drawing_image_cv2()
-    cv2.namedWindow('image')
-    cv2.setMouseCallback('image', Core.selectRegionOfInterest)
-    cv2.imshow('image', Core.image_current.image_display)
-    cv2.waitKey(0)
-    cv2.setMouseCallback('image', Core.dummyCallBack)
-    Core.training_predictor()
-
-    print "SWAG"
-    Core.image_current = ImageFactory("core/hpc1.png",F.projection_histogram,C.new_leuven_dichotomie)
-    Core.image_current.extract_feature_for_all_content()
-    Core.predict_classes_content_image_current()
-    Core.image_current.drawing_image_cv2()
-    cv2.namedWindow('image')
-    cv2.setMouseCallback('image', Core.selectRegionOfInterest)
-    cv2.imshow('image', Core.image_current.image_display)
-    cv2.waitKey(0)
-    cv2.setMouseCallback('image', Core.dummyCallBack)
-    Core.training_predictor()
-
-    print "SWAG"
-    Core.image_current = ImageFactory("core/hpc2.png",F.projection_histogram,C.new_leuven_dichotomie)
-    Core.image_current.extract_feature_for_all_content()
-    Core.predict_classes_content_image_current()
-    Core.image_current.drawing_image_cv2()
-    cv2.namedWindow('image')
-    cv2.setMouseCallback('image', Core.selectRegionOfInterest)
-    cv2.imshow('image', Core.image_current.image_display)
-    cv2.waitKey(0)
-    cv2.setMouseCallback('image', Core.dummyCallBack)
-    Core.training_predictor()
-
-    print "SWAG"
-    Core.image_current = ImageFactory("core/hpc3.png",F.projection_histogram,C.new_leuven_dichotomie)
-    Core.image_current.extract_feature_for_all_content()
-    Core.predict_classes_content_image_current()
-    Core.image_current.drawing_image_cv2()
-    cv2.namedWindow('image')
-    cv2.setMouseCallback('image', Core.selectRegionOfInterest)
-    cv2.imshow('image', Core.image_current.image_display)
-    cv2.waitKey(0)
-    cv2.setMouseCallback('image', Core.dummyCallBack)
-    Core.training_predictor()
-
-    print "SWAG"
-    Core.image_current = ImageFactory("core/hpc4.png",F.projection_histogram,C.new_leuven_dichotomie)
-    Core.image_current.extract_feature_for_all_content()
-    Core.predict_classes_content_image_current()
-    Core.image_current.drawing_image_cv2()
-    cv2.namedWindow('image')
-    cv2.setMouseCallback('image', Core.selectRegionOfInterest)
-    cv2.imshow('image', Core.image_current.image_display)
-    cv2.waitKey(0)
-    cv2.setMouseCallback('image', Core.dummyCallBack)
-    Core.training_predictor()
+    # Training
+    functionTest("core/test.png",Core,F,C)
+    functionTest("core/hpc1.png",Core,F,C)
+    functionTest("core/hpc2.png",Core,F,C)
+    functionTest("core/hpc3.png",Core,F,C)
+    functionTest("core/hpc4.png",Core,F,C)
+    functionTest("core/bad.png",Core,F,C)
+    functionTest("core/hpc5.png",Core,F,C)
+    functionTest("core/hpc6.png",Core,F,C)
+    functionTest("core/hpc7.png",Core,F,C)
+    functionTest("core/hpc8.png",Core,F,C)
+    functionTest("core/bad3.png",Core,F,C)
+    functionTest("core/hpc9.png",Core,F,C)
+    functionTest("core/hpc10.png",Core,F,C)
+    functionTest("core/hpc11.png",Core,F,C)
+    functionTest("core/hpc12.png",Core,F,C)
+    functionTest("core/hpc13.png",Core,F,C)
+    functionTest("core/hpc14.png",Core,F,C)
 
 
-    print "SWAG"
-    Core.image_current = ImageFactory("core/bad.png",F.projection_histogram,C.new_leuven_dichotomie)
-    Core.image_current.extract_feature_for_all_content()
-    Core.predict_classes_content_image_current()
-    Core.image_current.drawing_image_cv2()
-    cv2.namedWindow('image')
-    cv2.setMouseCallback('image', Core.selectRegionOfInterest)
-    cv2.imshow('image', Core.image_current.image_display)
-    cv2.waitKey(0)
-    cv2.setMouseCallback('image', Core.dummyCallBack)
-    Core.training_predictor()
+    Core.predictor.serialize()
+    Core.predictor.deserialize()
 
-
-    print "SWAG"
-    Core.image_current = ImageFactory("core/hpc5.png",F.projection_histogram,C.new_leuven_dichotomie)
-    Core.image_current.extract_feature_for_all_content()
-    Core.predict_classes_content_image_current()
-    Core.image_current.drawing_image_cv2()
-    cv2.namedWindow('image')
-    cv2.setMouseCallback('image', Core.selectRegionOfInterest)
-    cv2.imshow('image', Core.image_current.image_display)
-    cv2.waitKey(0)
-    cv2.setMouseCallback('image', Core.dummyCallBack)
-    Core.training_predictor()
-
-    print "SWAG"
-    Core.image_current = ImageFactory("core/hpc6.png",F.projection_histogram,C.new_leuven_dichotomie)
-    Core.image_current.extract_feature_for_all_content()
-    Core.predict_classes_content_image_current()
-    Core.image_current.drawing_image_cv2()
-    cv2.namedWindow('image')
-    cv2.setMouseCallback('image', Core.selectRegionOfInterest)
-    cv2.imshow('image', Core.image_current.image_display)
-    cv2.waitKey(0)
-    cv2.setMouseCallback('image', Core.dummyCallBack)
-    Core.training_predictor()
-
-    print "SWAG"
-    Core.image_current = ImageFactory("core/hpc7.png",F.projection_histogram,C.new_leuven_dichotomie)
-    Core.image_current.extract_feature_for_all_content()
-    Core.predict_classes_content_image_current()
-    Core.image_current.drawing_image_cv2()
-    cv2.namedWindow('image')
-    cv2.setMouseCallback('image', Core.selectRegionOfInterest)
-    cv2.imshow('image', Core.image_current.image_display)
-    cv2.waitKey(0)
-    cv2.setMouseCallback('image', Core.dummyCallBack)
-    Core.training_predictor()
-
-
-    print "SWAG"
-    Core.image_current = ImageFactory("core/hpc8.png",F.projection_histogram,C.new_leuven_dichotomie)
-    Core.image_current.extract_feature_for_all_content()
-    Core.predict_classes_content_image_current()
-    Core.image_current.drawing_image_cv2()
-    cv2.namedWindow('image')
-    cv2.setMouseCallback('image', Core.selectRegionOfInterest)
-    cv2.imshow('image', Core.image_current.image_display)
-    cv2.waitKey(0)
-    cv2.setMouseCallback('image', Core.dummyCallBack)
-    Core.training_predictor()
-
-    print "SWAG"
-    Core.image_current = ImageFactory("core/bad3.png",F.projection_histogram,C.new_leuven_dichotomie)
-    Core.image_current.extract_feature_for_all_content()
-    Core.predict_classes_content_image_current()
-    Core.image_current.drawing_image_cv2()
-    cv2.namedWindow('image')
-    cv2.setMouseCallback('image', Core.selectRegionOfInterest)
-    cv2.imshow('image', Core.image_current.image_display)
-    cv2.waitKey(0)
-    cv2.setMouseCallback('image', Core.dummyCallBack)
-    Core.training_predictor()
-
-    print "SWAG"
-    Core.image_current = ImageFactory("core/hpc9.png",F.projection_histogram,C.new_leuven_dichotomie)
-    Core.image_current.extract_feature_for_all_content()
-    Core.predict_classes_content_image_current()
-    Core.image_current.drawing_image_cv2()
-    cv2.namedWindow('image')
-    cv2.setMouseCallback('image', Core.selectRegionOfInterest)
-    cv2.imshow('image', Core.image_current.image_display)
-    cv2.waitKey(0)
-    cv2.setMouseCallback('image', Core.dummyCallBack)
-    Core.training_predictor()
-
-    print "SWAG"
-    Core.image_current = ImageFactory("core/hpc10.png",F.projection_histogram,C.new_leuven_dichotomie)
-    Core.image_current.extract_feature_for_all_content()
-    Core.predict_classes_content_image_current()
-    Core.image_current.drawing_image_cv2()
-    cv2.namedWindow('image')
-    cv2.setMouseCallback('image', Core.selectRegionOfInterest)
-    cv2.imshow('image', Core.image_current.image_display)
-    cv2.waitKey(0)
-    cv2.setMouseCallback('image', Core.dummyCallBack)
-    Core.training_predictor()
-
-    print "SWAG"
-    Core.image_current = ImageFactory("core/hpc11.png",F.projection_histogram,C.new_leuven_dichotomie)
-    Core.image_current.extract_feature_for_all_content()
-    Core.predict_classes_content_image_current()
-    Core.image_current.drawing_image_cv2()
-    cv2.namedWindow('image')
-    cv2.setMouseCallback('image', Core.selectRegionOfInterest)
-    cv2.imshow('image', Core.image_current.image_display)
-    cv2.waitKey(0)
-    cv2.setMouseCallback('image', Core.dummyCallBack)
-    Core.training_predictor()
-
-    print "SWAG"
-    Core.image_current = ImageFactory("core/hpc12.png",F.projection_histogram,C.new_leuven_dichotomie)
-    Core.image_current.extract_feature_for_all_content()
-    Core.predict_classes_content_image_current()
-    Core.image_current.drawing_image_cv2()
-    cv2.namedWindow('image')
-    cv2.setMouseCallback('image', Core.selectRegionOfInterest)
-    cv2.imshow('image', Core.image_current.image_display)
-    cv2.waitKey(0)
-    cv2.setMouseCallback('image', Core.dummyCallBack)
-    Core.training_predictor()
-
-    print "SWAG"
-    Core.image_current = ImageFactory("core/hpc13.png",F.projection_histogram,C.new_leuven_dichotomie)
-    Core.image_current.extract_feature_for_all_content()
-    Core.predict_classes_content_image_current()
-    Core.image_current.drawing_image_cv2()
-    cv2.namedWindow('image')
-    cv2.setMouseCallback('image', Core.selectRegionOfInterest)
-    cv2.imshow('image', Core.image_current.image_display)
-    cv2.waitKey(0)
-    cv2.setMouseCallback('image', Core.dummyCallBack)
-    Core.training_predictor()
-
-    print "SWAG"
-    Core.image_current = ImageFactory("core/hpc14.png",F.projection_histogram,C.new_leuven_dichotomie)
-    Core.image_current.extract_feature_for_all_content()
-    Core.predict_classes_content_image_current()
-    Core.image_current.drawing_image_cv2()
-    cv2.namedWindow('image')
-    cv2.setMouseCallback('image', Core.selectRegionOfInterest)
-    cv2.imshow('image', Core.image_current.image_display)
-    cv2.waitKey(0)
-    cv2.setMouseCallback('image', Core.dummyCallBack)
-    Core.training_predictor()
+    # Find table and Check
 
     pass
 

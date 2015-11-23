@@ -38,6 +38,13 @@ class ImageFactory(object):
         for y in range(0,height):
             gray[y][0] = 255
             gray[y][width-1] = 255
+        for y in range(0,height):
+            for x in range(0,width):
+                if gray[y][x] >= 250:
+                    gray[y][x] = 255
+                    pass
+                pass
+            pass
         return gray
 
 
