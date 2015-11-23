@@ -103,8 +103,7 @@ def blank_cutting_values(layout,seuil):
     return result
 
 def find_empty_spaces(layout, seuil):
-    start = 0
-    stop = 0
+    start, stop = 0, 0
     res = []
     for i in range(len(layout)):
         if layout[i] != 0 and start != 0:
@@ -114,10 +113,8 @@ def find_empty_spaces(layout, seuil):
         val = (stop - start)
         if val > 0:
             if val >= seuil:
-                res.append(start)
-                res.append(stop)
-            start = 0
-            stop = 0
+                res.append((start,stop))
+            start, stop = 0, 0
     return res
 
 
@@ -130,12 +127,13 @@ def process_each_chunk(img, output, x, y, cutting_value_seuil, blank_cutting_val
         local_x, local_y = local_projection(img[cutting_vals[i*2]:cutting_vals[i*2+1]+1][:])
         local_x, local_y = remove_lines(local_x, local_y, 0, 0.8)
         #print(local_y)
-        blank_cutvals = blank_cutting_values(local_y,blank_cutting_value_seuil)
+        print(i)
+        #blank_cutvals = blank_cutting_values(local_y,blank_cutting_value_seuil)
         blank_cutvals = find_empty_spaces(local_y,blank_cutting_value_seuil)
         print(blank_cutvals)
         # draw columns
-        for j in range(int(len(blank_cutvals)/2)):
-            line_y = (blank_cutvals[j*2] + blank_cutvals[j*2+1] +1)/2
+        for j in range(int(len(blank_cutvals))):
+            line_y = (blank_cutvals[j][0] + blank_cutvals[j][1] +1)/2
             for k in range(cutting_vals[i*2],cutting_vals[i*2+1]+1):
                 output[k][line_y] = 255
     # Draw lines
@@ -175,19 +173,61 @@ def main():
     filename = base+"."+ext
 
     img = preprocess(cv2.imread(filename))
-
+    w,h = img.shape
+    # Compute simple projection here
     x, y = local_projection(img)
-    x, y = remove_lines(x,y,0.1,0.99)
-    #x = clear_thin_lines(x, 2)
-    #y = clear_thin_lines(y, 2)
+    x, y = remove_lines(x,y,0,0.8)
     img = clean_img(img, x, y)
+    # Recompute simple projections after cleaning up existing lines or columns
+    local_x, local_y = local_projection(img)
+
+    # looking fo columns :
+    # Compute mean horizontal empty spacing
+    vertical_white_spacing = find_empty_spaces(local_y,1)
+    print(vertical_white_spacing)
+
+    mean = 0
+    for i in range(len(vertical_white_spacing)):
+        mean += vertical_white_spacing[i][1] - vertical_white_spacing[i][0]
+    mean/=len(vertical_white_spacing)
+    print(mean)
+    # keep only vertical spacings above 'mean' value
+    columns = []
+    for i in range(len(vertical_white_spacing)):
+        if vertical_white_spacing[i][1] - vertical_white_spacing[i][0] >= mean:
+            columns.append(vertical_white_spacing[i])
+    print(columns)
+    # draw columns
+    for j in range(int(len(columns))):
+        line_y = (columns[j][0] + columns[j][1] +1)/2
+        for k in range(w):
+            img[k][line_y] = 255
+
+    # looking for lines :
+    horizontal_white_spacing = find_empty_spaces(local_x,1)
+    mean = 0
+    for i in range(len(horizontal_white_spacing)):
+        mean += horizontal_white_spacing[i][1] - horizontal_white_spacing[i][0]
+    mean/=len(horizontal_white_spacing)
+    print(mean)
+    lines = []
+    for i in range(len(horizontal_white_spacing)):
+        if horizontal_white_spacing[i][1] - horizontal_white_spacing[i][0] >= mean:
+            lines.append(horizontal_white_spacing[i])
+    print(lines)
+    # draw lines
+    for j in range(int(len(lines))):
+        line_x = (lines[j][0] + lines[j][1] +1)/2
+        for k in range(h):
+            img[line_x][k] = 255
 
     cv2.imshow("image",img)
     cv2.waitKey()
+
     # modify last parameter to set minimum empty space between columns
-    table_layout =  process_each_chunk(img, img, x, y, 50, 10)
-    cv2.imshow("image",table_layout)
-    cv2.waitKey()
+    #table_layout =  process_each_chunk(img, img, x, y, 50, 24)
+    #cv2.imshow("image",table_layout)
+    #cv2.waitKey()
 
 
 if __name__ == '__main__':
