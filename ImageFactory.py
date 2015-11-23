@@ -51,7 +51,7 @@ class ImageFactory(object):
         self.image_display = self.image.copy()
         for x in range(0,len(self.list_classes)):
             if self.list_classes[x][1] == 1:
-                self.image_display[self.list_content[x][0][1]:self.list_content[x][1][1]+1, self.list_content[x][0][0]:self.list_content[x][1][0]+1] += np.array([220,220,220])
+                self.image_display[self.list_content[x][0][1]:self.list_content[x][1][1]+1, self.list_content[x][0][0]:self.list_content[x][1][0]+1 , 0] += 100
         for x in range(0,len(self.list_content)):
             cv2.rectangle(self.image_display, self.list_content[x][0], self.list_content[x][1], (255, 0, 0), 1)
 
