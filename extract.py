@@ -66,7 +66,10 @@ def clean_img(img,x,y):
 
 def cutting_values(layout, seuil):
     vals = np.nonzero(layout)[0]
-    cutting_vals = [vals[0]]
+    if len(vals) is not 0:
+        cutting_vals = [vals[0]]
+    else:
+        return []
     for i in range(len(vals)-1):
         if vals[i+1] - vals[i] >= seuil:
             cutting_vals.append(vals[i])
@@ -77,30 +80,66 @@ def cutting_values(layout, seuil):
 
 def blank_cutting_values(layout,seuil):
     zerovals = np.where(layout == 0)[0]
-    cutting_vals = [0]
+    if len(zerovals) is not 0:
+        cutting_vals = [zerovals[0]]
+    else:
+        return []
     for i in range(len(zerovals)-1):
-        if zerovals[i+1] - zerovals[i] >= seuil:
+        if zerovals[i+1] - zerovals[i] >= 2:
             cutting_vals.append(zerovals[i])
             cutting_vals.append((zerovals[i+1]))
-    return cutting_vals
+    cutting_vals.append(zerovals[len(zerovals)-1])
+    cutting_vals = np.unique(cutting_vals)
+    #print(cutting_vals)
+    result = []
+    for i in range(len(cutting_vals)/2 ):
+        if cutting_vals[i*2+1] - cutting_vals[i*2] >= seuil:
+            #print(str(cutting_vals[i*2+1])+" ,"+str(cutting_vals[i*2]))
+            result.append(cutting_vals[i*2])
+            result.append(cutting_vals[i*2+1])
+        else:
+            pass
+    #print(result)
+    return result
+
+def find_empty_spaces(layout, seuil):
+    start = 0
+    stop = 0
+    res = []
+    for i in range(len(layout)):
+        if layout[i] != 0 and start != 0:
+            stop = i
+        if layout[i] == 0 and start == 0:
+            start = i
+        val = (stop - start)
+        if val > 0:
+            if val >= seuil:
+                res.append(start)
+                res.append(stop)
+            start = 0
+            stop = 0
+    return res
+
 
 
 def process_each_chunk(img, output, x, y, cutting_value_seuil, blank_cutting_value_seuil):
     cutting_vals = cutting_values(x,cutting_value_seuil)
-    print(cutting_vals)
-    table_layout = np.zeros(img.shape)
+    #print(cutting_vals)
     for i in range(int(len(cutting_vals)/2)):
         # compute local columns projection
         local_x, local_y = local_projection(img[cutting_vals[i*2]:cutting_vals[i*2+1]+1][:])
         local_x, local_y = remove_lines(local_x, local_y, 0, 0.8)
+        #print(local_y)
         blank_cutvals = blank_cutting_values(local_y,blank_cutting_value_seuil)
+        blank_cutvals = find_empty_spaces(local_y,blank_cutting_value_seuil)
+        print(blank_cutvals)
         # draw columns
         for j in range(int(len(blank_cutvals)/2)):
             line_y = (blank_cutvals[j*2] + blank_cutvals[j*2+1] +1)/2
             for k in range(cutting_vals[i*2],cutting_vals[i*2+1]+1):
                 output[k][line_y] = 255
     # Draw lines
-    blank_cutvals_lines = blank_cutting_values(x,2)
+    blank_cutvals_lines = blank_cutting_values(x,5)
     for i in range(int(len(blank_cutvals_lines)/2)):
         line_x = (blank_cutvals_lines[i*2] + blank_cutvals_lines[i*2+1] +1)/2
         output[line_x][:] = 255
@@ -138,12 +177,15 @@ def main():
     img = preprocess(cv2.imread(filename))
 
     x, y = local_projection(img)
-    x, y = remove_lines(x,y,0.9,0.9)
-    x = clear_thin_lines(x, 2)
-    y = clear_thin_lines(y, 2)
+    x, y = remove_lines(x,y,0.1,0.99)
+    #x = clear_thin_lines(x, 2)
+    #y = clear_thin_lines(y, 2)
     img = clean_img(img, x, y)
 
-    table_layout =  process_each_chunk(img, img, x, y, 10, 5)
+    cv2.imshow("image",img)
+    cv2.waitKey()
+    # modify last parameter to set minimum empty space between columns
+    table_layout =  process_each_chunk(img, img, x, y, 50, 10)
     cv2.imshow("image",table_layout)
     cv2.waitKey()
 
