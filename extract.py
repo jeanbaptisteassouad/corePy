@@ -25,22 +25,17 @@ def local_projection(img):
     return x, y
 
 
-def remove_lines(x,y, mean_percentile, max_percentile):
-    mean_h, max_h = (mean_percentile*np.mean(x),max_percentile*np.max(x))
-    mean_w, max_w = (mean_percentile*np.mean(y),max_percentile*np.max(y))
+def remove_lines(x, mean_percentile, max_percentile):
+    mean, max = (mean_percentile*np.mean(x),max_percentile*np.max(x))
     # remove lines under mean and above maximal value
     for i in range(len(x)):
-        if x[i] < mean_h or x[i] > max_h:
+        if x[i] < mean or x[i] > max:
             x[i] = 0
-    for i in range(len(y)):
-        if y[i] < mean_w or y[i] > max_w:
-            y[i] = 0
-    return x, y
+    return x
 
 
 def clear_thin_lines(layout, seuil):
-    start = 0
-    stop = 0
+    start, stop = 0, 0
     for i in range(len(layout)):
         if layout[i] != 0 and start == 0:
             start = i
@@ -51,8 +46,7 @@ def clear_thin_lines(layout, seuil):
             if val <= seuil:
                 for j in range(start,stop):
                     layout[j] = 0
-            start = 0
-            stop = 0
+            start, stop = 0, 0
     return layout
 
 
@@ -103,8 +97,7 @@ def blank_cutting_values(layout,seuil):
     return result
 
 def find_empty_spaces(layout, seuil):
-    start, stop = 0, 0
-    res = []
+    start, stop, res = 0, 0, []
     for i in range(len(layout)):
         if layout[i] != 0 and start != 0:
             stop = i
@@ -166,9 +159,30 @@ def projection_histogram(img):
         pass
     return features
 
+def sub_img_column_work(img):
+    # work with columns
+    h, w = img.shape
+    local_x, local_y = local_projection(img)
+    vertical_white_spacing = find_empty_spaces(local_y,1)
+    mean = 0
+    for i in range(len(vertical_white_spacing)):
+        mean += vertical_white_spacing[i][1] - vertical_white_spacing[i][0]
+    mean/=len(vertical_white_spacing)
+    # keep only vertical spacings above 'mean' value
+    columns = []
+    for i in range(len(vertical_white_spacing)):
+        if vertical_white_spacing[i][1] - vertical_white_spacing[i][0] >= mean:
+            columns.append(vertical_white_spacing[i])
+    # draw columns
+    for j in range(int(len(columns))):
+        line_y = (columns[j][0] + columns[j][1] +1)/2
+        for k in range(h):
+            img[k][line_y] = 255
+    return img
+
 
 def main():
-    base = "core/table"
+    base = "../crossmorse_spurgear"
     ext="png"
     filename = base+"."+ext
 
@@ -176,10 +190,15 @@ def main():
     w,h = img.shape
     # Compute simple projection here
     x, y = local_projection(img)
-    x, y = remove_lines(x,y,0,0.8)
+    x, y = remove_lines(x, 0.2, 0.8), remove_lines(y, 0.2, 0.8)
+    x, y = clear_thin_lines(x,5), clear_thin_lines(y,5)
     img = clean_img(img, x, y)
+
     # Recompute simple projections after cleaning up existing lines or columns
     local_x, local_y = local_projection(img)
+
+    cv2.imshow("image",img)
+    cv2.waitKey()
 
     # looking fo columns :
     # Compute mean horizontal empty spacing
@@ -229,6 +248,52 @@ def main():
     #cv2.imshow("image",table_layout)
     #cv2.waitKey()
 
+def main2():
+    base = "../table"
+    ext="png"
+    filename = base+"."+ext
+
+    img = preprocess(cv2.imread(filename))
+    w,h = img.shape
+    # Compute simple projection here
+    x, y = local_projection(img)
+    x, y = remove_lines(x, 0.2, 0.8), remove_lines(y, 0.2, 0.8)
+    x, y = clear_thin_lines(x,5), clear_thin_lines(y,5)
+    img = clean_img(img, x, y)
+
+    cv2.imshow("image",img)
+    cv2.waitKey()
+
+    # Recompute simple projections after cleaning up existing lines or columns
+    local_x, local_y = local_projection(img)
+
+    # working with lines
+    horizontal_white_spacing = find_empty_spaces(local_x,1)
+    mean = 0
+    for i in range(len(horizontal_white_spacing)):
+        mean += horizontal_white_spacing[i][1] - horizontal_white_spacing[i][0]
+    mean/=len(horizontal_white_spacing)
+    print(mean)
+    lines = []
+    for i in range(len(horizontal_white_spacing)):
+        if horizontal_white_spacing[i][1] - horizontal_white_spacing[i][0] >= mean:
+            lines.append(horizontal_white_spacing[i])
+    print(lines)
+
+    # For each line :
+    for j in range(int(len(lines)-1)):
+        line_x_1 = (lines[j][0] + lines[j][1] +1)/2
+        line_x_2 = (lines[j+1][0] + lines[j+1][1] +1)/2
+        # current sub image
+        img[line_x_1:line_x_2][:]=sub_img_column_work(img[line_x_1:line_x_2][:])
+        # draw jth line
+        for k in range(h):
+            img[line_x_1][k] = 255
+
+
+    cv2.imshow("image",img)
+    cv2.waitKey()
+
 
 if __name__ == '__main__':
-    main()
+    main2()
