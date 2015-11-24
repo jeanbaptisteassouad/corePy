@@ -212,6 +212,8 @@ class Content(object):
 
         retval , matrice = cv2.threshold(matrice,125,255,cv2.THRESH_BINARY)
 
+        cv2.imshow("Image1", matrice)
+
         # matrice = cv2.bitwise_not(matrice)
 
         # dichoArray = self.new_leuven_dichotomie(image, matrice, deep=0)
@@ -219,9 +221,9 @@ class Content(object):
         # for x in range(0,len(dichoArray)):
         #     cv2.rectangle(matrice, dichoArray[x][0], dichoArray[x][1], (125, 0, 0), 1)
 
-        # # Pour les colonnes
-        # kernel = np.matrix('1; 1; 1')
-        # matrice = self.__fermeture(matrice,kernel,height)
+        # Pour les colonnes
+        kernel = np.matrix('1; 1; 1')
+        matrice = self.__fermeture(matrice,kernel,height)
         # kernel = np.matrix('1 1 1')
 
         # isFirst = True
@@ -242,27 +244,27 @@ class Content(object):
         # matrice = self.__fermeture(matrice,kernel,average/2)
 
 
-        # Pour les lignes
-        kernel = np.matrix('1 1 1')
-        matrice = self.__fermeture(matrice,kernel,width)
-        kernel = np.matrix('1; 1; 1')
+        # # Pour les lignes
+        # kernel = np.matrix('1 1 1')
+        # matrice = self.__fermeture(matrice,kernel,width)
+        # kernel = np.matrix('1; 1; 1')
 
-        isFirst = True
-        cpt = 0
-        listEspace = []
-        for y in range(0,height):
-            if matrice[y][0] == 0:
-                isFirst = False
-                cpt += 1
-            if matrice[y][0] == 255 and isFirst == False:
-                isFirst = True
-                listEspace.append( cpt )
-                cpt = 0
-                pass
-            pass
-        average = sum(listEspace)/len(listEspace)
-        kernel = np.matrix('1; 1; 1')
-        matrice = self.__fermeture(matrice,kernel,average/2)
+        # isFirst = True
+        # cpt = 0
+        # listEspace = []
+        # for y in range(0,height):
+        #     if matrice[y][0] == 0:
+        #         isFirst = False
+        #         cpt += 1
+        #     if matrice[y][0] == 255 and isFirst == False:
+        #         isFirst = True
+        #         listEspace.append( cpt )
+        #         cpt = 0
+        #         pass
+        #     pass
+        # average = sum(listEspace)/len(listEspace)
+        # kernel = np.matrix('1; 1; 1')
+        # matrice = self.__fermeture(matrice,kernel,average/2)
 
 
         # dichoArray = self.__paris_dichotomie_recursive(matrice,1,frame)
