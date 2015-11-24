@@ -249,7 +249,7 @@ def main():
     #cv2.waitKey()
 
 def main2():
-    base = "../table"
+    base = "core/table"
     ext="png"
     filename = base+"."+ext
 
@@ -262,7 +262,7 @@ def main2():
     img = clean_img(img, x, y)
 
     cv2.imshow("image",img)
-    cv2.waitKey()
+    cv2.waitKey(0)
 
     # Recompute simple projections after cleaning up existing lines or columns
     local_x, local_y = local_projection(img)
@@ -292,7 +292,7 @@ def main2():
 
 
     cv2.imshow("image",img)
-    cv2.waitKey()
+    cv2.waitKey(0)
 
 
 if __name__ == '__main__':
