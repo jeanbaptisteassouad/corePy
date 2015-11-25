@@ -123,50 +123,82 @@ class Content(object):
         return cv2.erode(matriceTmp, kernel, iterations=itera)
 
 
+    def __set_border_to_black(self,matriceLigne,matriceCol,frame):
+        for y in range(0 , len(matriceCol) ):
+            matriceCol[y][0] = 0
+            matriceCol[y][frame[1][0] - frame[0][0]] = 0
 
-    def __paris_dichotomie_recursive(self,matrice,deep,frame):
+
+        for x in range(0 ,len(matriceLigne[0]) ):
+            matriceLigne[0][x] = 0
+            matriceLigne[frame[1][1] - frame[0][1]][x] = 0
+
+        return matriceLigne, matriceCol
+
+
+
+    def __paris_dichotomie_recursive(self,matriceOrigine,deep,frame,thresholdWidth):
         if deep <= 0:
             return [frame]
-        sumLine = np.zeros(frame[1][1]+1 - frame[0][1])
-        sumCol = np.zeros(frame[1][0]+1 - frame[0][0])
-        for y in range(frame[0][1],frame[1][1]+1):
-            for x in range(frame[0][0],frame[1][0]+1):
-                sumLine[y-frame[0][1]] += matrice[y][x]
-                sumCol[x-frame[0][0]] += matrice[y][x]
-                pass
-            pass
+
+        matrice = matriceOrigine[ frame[0][1]:frame[1][1]+1 , frame[0][0]:frame[1][0]+1 ]
+
+        # Pour les colonnes
+        kernel = np.matrix('1; 1; 1')
+        matriceCol = self.__fermeture(matrice,kernel,frame[1][1]+1 - frame[0][1])
+        kernel = np.matrix('1 1 1')
+        matriceCol = self.__fermeture(matriceCol,kernel,thresholdWidth)
+
+
+        # Pour les lignes
+        kernel = np.matrix('1 1 1')
+        matriceLigne = self.__fermeture(matrice,kernel,frame[1][0]+1 - frame[0][0])
+        # kernel = np.matrix('1; 1; 1')
+        # matriceLigne = self.__fermeture(matriceLigne,kernel,minHeightFrame)
+
+        matriceLigne, matriceCol = self.__set_border_to_black(matriceLigne,matriceCol,frame)
+
+        # if frame == [(0, 8), (198, 59)]:
+        #     cv2.imshow("Image1", matriceLigne)
+        #     cv2.imshow("Image", matrice)
+        #     cv2.waitKey(0)
+        #     exit()
 
         noMoreOne = True
         pointLine = []
-        for i in range(0,len(sumLine)):
-            if sumLine[i] > 0:
+        for y in range(0,frame[1][1]+1 - frame[0][1]):
+            if matriceLigne[y][0] > 0:
                 if noMoreOne:
                     noMoreOne = False
-                    pointLine.append( i-1 + frame[0][1])
+                    pointLine.append( y-1 + frame[0][1])
                     pass
                 pass
             elif not noMoreOne:
                 noMoreOne = True
-                pointLine.append( i + frame[0][1])
+                pointLine.append( y + frame[0][1])
+
 
         noMoreOne = True
         pointCol = []
-        for i in range(0,len(sumCol)):
-            if sumCol[i] > 0:
+        for x in range(0,frame[1][0]+1 - frame[0][0]):
+            if matriceCol[0][x] > 0:
                 if noMoreOne:
                     noMoreOne = False
-                    pointCol.append( i-1 + frame[0][0])
+                    pointCol.append( x-1 + frame[0][0])
                     pass
                 pass
             elif not noMoreOne:
                 noMoreOne = True
-                pointCol.append( i + frame[0][0])
+                pointCol.append( x + frame[0][0])
 
-        if len(pointLine) == 0 or len(pointCol) == 0:
+        if pointCol == [] or pointLine == []:
             return [frame]
 
-        pointLine = compute_best_point(pointLine,frame[1][1]+1 - frame[0][1])
-        pointCol = compute_best_point(pointCol,frame[1][0]+1 - frame[0][0])
+
+        # if pointCol == []:
+        #     pointCol = [frame[0][0] , frame[1][0]]
+        # elif pointLine == []:
+        #     pointLine = [frame[0][1] , frame[1][1]]
 
         dichoArray = []
         for y in range(0,len(pointLine)/2):
@@ -174,9 +206,11 @@ class Content(object):
                 dichoArray.append( [(pointCol[2*x],pointLine[2*y]),(pointCol[2*x+1],pointLine[2*y+1])] )
         pass
 
+
+
         ans = []
         for x in range(0,len(dichoArray)):
-            ans += self.__paris_dichotomie_recursive(matrice, deep-1, dichoArray[x])
+            ans += self.__paris_dichotomie_recursive(matriceOrigine, deep-1, dichoArray[x],thresholdWidth)
 
         return ans
 
@@ -189,7 +223,6 @@ class Content(object):
 
         ret, matrice = cv2.threshold(gray,150,255,cv2.THRESH_BINARY)
         matrice = cv2.Laplacian(matrice, cv2.CV_8U)
-
 
         kernel = np.matrix('1; 1; 1')
         matriceVerti = self.__ouverture(matrice,kernel,10)
@@ -212,137 +245,28 @@ class Content(object):
 
         retval , matrice = cv2.threshold(matrice,125,255,cv2.THRESH_BINARY)
 
-        cv2.imshow("Image1", matrice)
-
-        # matrice = cv2.bitwise_not(matrice)
-
-        # dichoArray = self.new_leuven_dichotomie(image, matrice, deep=0)
-
-        # for x in range(0,len(dichoArray)):
-        #     cv2.rectangle(matrice, dichoArray[x][0], dichoArray[x][1], (125, 0, 0), 1)
-
-        # Pour les colonnes
-        kernel = np.matrix('1; 1; 1')
-        matrice = self.__fermeture(matrice,kernel,height)
-        # kernel = np.matrix('1 1 1')
-
-        # isFirst = True
-        # cpt = 0
-        # listEspace = []
-        # for x in range(0,width):
-        #     if matrice[0][x] == 0:
-        #         isFirst = False
-        #         cpt += 1
-        #     if matrice[0][x] == 255 and isFirst == False:
-        #         isFirst = True
-        #         listEspace.append( cpt )
-        #         cpt = 0
-        #         pass
-        #     pass
-        # average = sum(listEspace)/len(listEspace)
-        # kernel = np.matrix('1 1 1')
-        # matrice = self.__fermeture(matrice,kernel,average/2)
+        # on va chercher toutes les lettres de la page
+        dichoArray = self.new_leuven_dichotomie(image, cv2.bitwise_not(matrice), deep=10)
+        thresholdWidth = 0
+        # minHeightFrame = 1000000
+        for x in range(0,len(dichoArray)):
+            # minWidthFrame = min(minWidthFrame, dichoArray[x][1][0] - dichoArray[x][0][0] )
+            thresholdWidth += dichoArray[x][1][0] - dichoArray[x][0][0]
+        thresholdWidth /= len(dichoArray)
 
 
-        # # Pour les lignes
-        # kernel = np.matrix('1 1 1')
-        # matrice = self.__fermeture(matrice,kernel,width)
-        # kernel = np.matrix('1; 1; 1')
 
-        # isFirst = True
-        # cpt = 0
-        # listEspace = []
-        # for y in range(0,height):
-        #     if matrice[y][0] == 0:
-        #         isFirst = False
-        #         cpt += 1
-        #     if matrice[y][0] == 255 and isFirst == False:
-        #         isFirst = True
-        #         listEspace.append( cpt )
-        #         cpt = 0
-        #         pass
-        #     pass
-        # average = sum(listEspace)/len(listEspace)
-        # kernel = np.matrix('1; 1; 1')
-        # matrice = self.__fermeture(matrice,kernel,average/2)
+        dichoArray = self.__paris_dichotomie_recursive(matrice,10,frame,thresholdWidth)
+
+        for x in range(0,len(dichoArray)):
+            cv2.rectangle(matrice, dichoArray[x][0], dichoArray[x][1], (125, 0, 0), 1)
 
 
-        # dichoArray = self.__paris_dichotomie_recursive(matrice,1,frame)
+        # cv2.imshow("Image", matrice)
+        # cv2.waitKey(0)
+        return dichoArray
 
 
-        # for x in range(0,len(dichoArray)):
-        #     cv2.rectangle(matrice, dichoArray[x][0], dichoArray[x][1], (125, 0, 0), 1)
-
-        cv2.imshow("Image", matrice)
-        cv2.waitKey(0)
-        pass
-
-
-def apply_threshold_to_point(point,dimension,threshold):
-    if point == []:
-        return point
-    elif len(point) < 4:
-        return point
-    else:
-        if (point[1] - point[0])/float(dimension) <= threshold or (point[2] - point[1])/float(dimension) <= threshold or (point[3] - point[2])/float(dimension) <= threshold:
-            return apply_threshold_to_point([point[0]] + point[3:len(point)],dimension,threshold)
-        else:
-            return [ point[0], point[1]] + apply_threshold_to_point(point[2:len(point)],dimension,threshold)
-    pass
-
-
-def compute_next_point_ecart_type(point,dimension):
-    list_interval = []
-    ratio = -1
-    for i in range(0,len(point)-1):
-        list_interval.append( (point[i+1] - point[i])/float(dimension) )
-        pass
-
-    threshold = 0
-    average_list_inter = sum(list_interval)/len(list_interval)
-    variance_list_inter = 0
-    for i in range(0,len(list_interval)):
-        variance_list_inter += pow( list_interval[i] - average_list_inter, 2 )
-        pass
-    variance_list_inter /= len(list_interval)
-    ecart_type_list_inter = pow(variance_list_inter,0.5)
-    list_interval.sort()
-
-    threshold = list_interval[0]
-
-    point = apply_threshold_to_point(point,dimension,threshold)
-
-    if ecart_type_list_inter != 0:
-        ratio = average_list_inter / ecart_type_list_inter
-
-    return point , ratio
-
-
-def compute_best_point(point,dimension):
-    ratio = 0
-    maxRatio = 0
-    best_point = []
-    # while ratio != -1:
-    #     point, ratio = compute_next_point_ecart_type(point,dimension)
-    #     if ratio > maxRatio:
-    #         maxRatio = ratio
-    #         best_point = point
-
-
-    # list_interval = []
-    # for i in range(0,len(point)/2):
-    #     list_interval.append( (point[2*i+1] - point[2*i])/float(dimension) )
-    #     pass
-
-    # average = sum(list_interval)/len(list_interval)
-
-    # for i in range(0,len(point)/2):
-    #     if (point[2*i+1] - point[2*i])/float(dimension) > average:
-    #         best_point.append( point[2*i] )
-    #         best_point.append( point[2*i+1] )
-    #         pass
-    #     pass
-    return best_point
 
 
 

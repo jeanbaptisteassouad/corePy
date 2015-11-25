@@ -53,8 +53,8 @@ def main():
     C = Content()
     T = TableFactory("core/table4.png",C.paris_dichotomie)
     T.drawing_image_cv2()
-    # cv2.imshow("Image", T.image_display)
-    # cv2.waitKey(0)
+    cv2.imshow("Image", T.image_display)
+    cv2.waitKey(0)
     pass
 
 
