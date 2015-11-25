@@ -1,5 +1,7 @@
 import numpy as np
 import cv2
+import auto_pick_train
+
 
 class CorePy(object):
     """docstring for CorePy"""
@@ -25,9 +27,6 @@ class CorePy(object):
     def training_predictor(self):
         self.predictor.train(self.image_current.list_feature , self.image_current.list_classes)
         pass
-
-
-
 
 
 
@@ -102,24 +101,12 @@ def main():
     K = Kppv()
     Core = CorePy("",K)
 
+    list_path_training = auto_pick_train.get_training_image("png/10/HPC-T4-2013-GearsAndSprockets-GB/")
     # Training
-    functionTest("core/test.png",Core,F,C)
-    functionTest("core/hpc1.png",Core,F,C)
-    functionTest("core/hpc2.png",Core,F,C)
-    functionTest("core/hpc3.png",Core,F,C)
-    functionTest("core/hpc4.png",Core,F,C)
-    functionTest("core/bad.png",Core,F,C)
-    functionTest("core/hpc5.png",Core,F,C)
-    functionTest("core/hpc6.png",Core,F,C)
-    functionTest("core/hpc7.png",Core,F,C)
-    functionTest("core/hpc8.png",Core,F,C)
-    functionTest("core/bad3.png",Core,F,C)
-    functionTest("core/hpc9.png",Core,F,C)
-    functionTest("core/hpc10.png",Core,F,C)
-    functionTest("core/hpc11.png",Core,F,C)
-    functionTest("core/hpc12.png",Core,F,C)
-    functionTest("core/hpc13.png",Core,F,C)
-    functionTest("core/hpc14.png",Core,F,C)
+    for x in range(0,len(list_path_training)):
+        functionTest("png/500/HPC-T4-2013-GearsAndSprockets-GB/"+list_path_training[x],Core,F,C)
+        pass
+
 
 
     Core.predictor.serialize()

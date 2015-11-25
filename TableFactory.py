@@ -13,7 +13,7 @@ class TableFactory(object):
         self.gray = self.__prepare_image_gray()
         self.gray_display = self.gray.copy()
         self.content_extractor = content_extractor
-        self.list_content = content_extractor(self.image,self.gray)
+        self.tree_of_content = content_extractor(self.image,self.gray)
 
 
 
@@ -44,14 +44,17 @@ class TableFactory(object):
 
     def drawing_image_cv2(self):
         self.image_display = self.image.copy()
-        for x in range(0,len(self.list_content)):
-            cv2.rectangle(self.image_display, self.list_content[x][0], self.list_content[x][1], (255, 0, 0), 1)
-
+        self.tree_of_content.display_only_leaf_cv2( self.image_display)
 
 
 def main():
     C = Content()
-    T = TableFactory("core/table4.png",C.paris_dichotomie)
+    T = TableFactory("core/table3.png",C.paris_dichotomie)
+    T.tree_of_content.remove_useless_leaf()
+    T.tree_of_content.sort_subtree_by_frame()
+    # print T.tree_of_content.compute_layout_table()
+    # print T.tree_of_content.list_number_line_subtree
+    # print T.tree_of_content.list_number_col_subtree
     T.drawing_image_cv2()
     cv2.imshow("Image", T.image_display)
     cv2.waitKey(0)

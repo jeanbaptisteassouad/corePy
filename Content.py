@@ -139,7 +139,8 @@ class Content(object):
 
     def __paris_dichotomie_recursive(self,matriceOrigine,deep,frame,thresholdWidth):
         if deep <= 0:
-            return [frame]
+            # return [frame]
+            return Tree(frame)
 
         matrice = matriceOrigine[ frame[0][1]:frame[1][1]+1 , frame[0][0]:frame[1][0]+1 ]
 
@@ -192,7 +193,8 @@ class Content(object):
                 pointCol.append( x + frame[0][0])
 
         if pointCol == [] or pointLine == []:
-            return [frame]
+            # return [frame]
+            return Tree(frame)
 
 
         # if pointCol == []:
@@ -208,9 +210,11 @@ class Content(object):
 
 
 
-        ans = []
+        # ans = []
+        ans = Tree(frame)
         for x in range(0,len(dichoArray)):
-            ans += self.__paris_dichotomie_recursive(matriceOrigine, deep-1, dichoArray[x],thresholdWidth)
+            # ans += self.__paris_dichotomie_recursive(matriceOrigine, deep-1, dichoArray[x],thresholdWidth)
+            ans.list_subtree += [self.__paris_dichotomie_recursive(matriceOrigine, deep-1, dichoArray[x],thresholdWidth)]
 
         return ans
 
@@ -256,17 +260,111 @@ class Content(object):
 
 
 
-        dichoArray = self.__paris_dichotomie_recursive(matrice,10,frame,thresholdWidth)
+        # dichoArray = self.__paris_dichotomie_recursive(matrice,1,frame,thresholdWidth)
+        tree_of_frames = self.__paris_dichotomie_recursive(matrice,10,frame,thresholdWidth)
 
-        for x in range(0,len(dichoArray)):
-            cv2.rectangle(matrice, dichoArray[x][0], dichoArray[x][1], (125, 0, 0), 1)
+
+        # for x in range(0,len(dichoArray)):
+        #     cv2.rectangle(matrice, dichoArray[x][0], dichoArray[x][1], (125, 0, 0), 1)
 
 
         # cv2.imshow("Image", matrice)
         # cv2.waitKey(0)
-        return dichoArray
+        return tree_of_frames
 
 
+
+class Tree(object):
+    """docstring for Tree"""
+    def __init__(self, frame):
+        super(Tree, self).__init__()
+        self.frame = frame
+        self.number_of_subframe = 0
+        self.list_subtree = []
+        self.list_number_line_subtree = []
+        self.list_number_col_subtree = []
+
+
+    def display_only_leaf_cv2(self,matrice):
+        if self.list_subtree == []:
+            cv2.rectangle(matrice, self.frame[0], self.frame[1], (125, 0, 0), 1)
+        else:
+            for x in range(0,len(self.list_subtree)):
+                self.list_subtree[x].display_only_leaf_cv2(matrice)
+                pass
+
+    def display_cv2(self,matrice):
+        if self.list_subtree == []:
+            cv2.rectangle(matrice, self.frame[0], self.frame[1], (125, 0, 0), 1)
+        else:
+            cv2.rectangle(matrice, self.frame[0], self.frame[1], (125, 0, 0), 1)
+            for x in range(0,len(self.list_subtree)):
+                self.list_subtree[x].display_cv2(matrice)
+                pass
+
+    def remove_useless_leaf(self):
+        if self.list_subtree == []:
+            return
+        else:
+            if len(self.list_subtree) == 1:
+                self.number_of_subframe = 0
+                self.list_subtree = []
+            else:
+                for x in range(0,len(self.list_subtree)):
+                    self.list_subtree[x].remove_useless_leaf()
+
+    def sort_subtree_by_frame(self):
+        if self.list_subtree == []:
+            return
+        else:
+            self.list_subtree.sort( key=lambda a: (a.frame[0][1],a.frame[0][0]) )
+            for x in range(0,len(self.list_subtree)):
+                self.list_subtree[x].sort_subtree_by_frame()
+
+    def __repr__(self):
+        return '{}: y={} x={}'.format(self.__class__.__name__,
+                                  self.frame[0][1],
+                                  self.frame[0][0])
+
+
+    def compute_layout_table(self):
+        if self.list_subtree == []:
+            return  [0,0]
+        else:
+            self.list_number_line_subtree = []
+            self.list_number_col_subtree = []
+            list_number_line = []
+            list_number_col = []
+            for x in range(0,len(self.list_subtree)):
+                if x == 0:
+                    list_number_line.append( self.list_subtree[x].frame[0][1] )
+                    list_number_col.append( self.list_subtree[x].frame[0][0] )
+                elif self.list_subtree[x].frame[0][1] > list_number_line[len(list_number_line)-1]:
+                    list_number_line.append( self.list_subtree[x].frame[0][1] )
+                elif self.list_subtree[x].frame[0][0] > list_number_col[len(list_number_col)-1]:
+                    list_number_col.append( self.list_subtree[x].frame[0][0] )
+                pass
+            ans = [len(list_number_line) , len(list_number_col)]
+            for x in range(0,len(self.list_subtree)):
+                tmp = self.list_subtree[x].compute_layout_table()
+                self.list_number_line_subtree.append( tmp[0] )
+                self.list_number_col_subtree.append( tmp[1] )
+
+            tmp = 0
+            for x in range(0,len(self.list_number_line_subtree)):
+                tmp = max(tmp, self.list_number_line_subtree[x])
+                pass
+            if tmp != 0:
+                ans[0] += tmp - 1
+
+            tmp = 0
+            for x in range(0,len(self.list_number_col_subtree)):
+                tmp = max(tmp, self.list_number_col_subtree[x])
+                pass
+            if tmp != 0:
+                ans[1] += tmp - 1
+
+            return ans
 
 
 
