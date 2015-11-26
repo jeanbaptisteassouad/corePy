@@ -1,7 +1,7 @@
 import numpy as np
 import cv2
 import auto_pick_train
-
+import os
 
 class CorePy(object):
     """docstring for CorePy"""
@@ -79,7 +79,7 @@ class CorePy(object):
         pass
 
 
-def functionTest(path,Core,F,C):
+def functionTestTraining(path,Core,F,C):
     print "SWAG"
     Core.image_current = ImageFactory(path,F.projection_histogram,C.new_leuven_dichotomie)
     Core.image_current.extract_feature_for_all_content()
@@ -93,6 +93,17 @@ def functionTest(path,Core,F,C):
     Core.training_predictor()
     pass
 
+def functionTestExtractTable(path,Core,F,C):
+    print "THUG"
+    Core.image_current = ImageFactory(path,F.projection_histogram,C.new_leuven_dichotomie)
+    Core.image_current.extract_feature_for_all_content()
+    Core.training_predict_classes_current()
+    Core.image_current.drawing_image_cv2()
+    cv2.namedWindow('image')
+    cv2.imshow('image', Core.image_current.image_display)
+    cv2.waitKey(0)
+    pass
+
 
 def main():
     F = Feature()
@@ -101,18 +112,20 @@ def main():
     K = Kppv()
     Core = CorePy("",K)
 
-    list_path_training = auto_pick_train.get_training_image("png/10/HPC-T4-2013-GearsAndSprockets-GB/")
+    list_path_training = auto_pick_train.get_training_image("png/20/HPC-T4-2013-GearsAndSprockets-GB/")
     # Training
     for x in range(0,len(list_path_training)):
-        functionTest("png/500/HPC-T4-2013-GearsAndSprockets-GB/"+list_path_training[x],Core,F,C)
+        functionTestTraining("png/500/HPC-T4-2013-GearsAndSprockets-GB/"+list_path_training[x],Core,F,C)
         pass
 
 
 
     Core.predictor.serialize()
-    Core.predictor.deserialize()
+    # Core.predictor.deserialize()
 
-    # Find table and Check
+    # # Find table and Check
+    # for filename in os.listdir("png/500/HPC-T4-2013-GearsAndSprockets-GB/"):
+    #     functionTestExtractTable("png/500/HPC-T4-2013-GearsAndSprockets-GB/"+filename,Core,F,C)
 
     pass
 

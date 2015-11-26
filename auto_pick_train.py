@@ -33,7 +33,15 @@ def computeVariance(listImageAlreadyUse,newOne):
 	if ans==[]:
 		return 0
 
-	return sum(ans)/len(ans)
+	variance = 0
+	moy = sum(ans)/len(ans)
+	for x in range(0,len(ans)):
+		variance += pow(ans[x] - moy  ,2)
+		pass
+	variance /= len(ans)
+	variance = pow(variance,0.5)
+
+	return moy*variance
 
 def get_training_image(path):
 	listImageAlreadyUse = []

@@ -9,6 +9,8 @@ class Kppv(Predictor):
         super(Kppv, self).__init__()
         self.k = 1
 
+
+
     def train(self, datas, classes):
         new_datas = np.resize( self.datas, (len(self.datas)+len(datas),500) )
         new_datas[0:len(self.datas)] = self.datas
@@ -20,14 +22,13 @@ class Kppv(Predictor):
         new_classes[len(self.classes):len(self.classes)+len(classes)] = classes
         self.classes = new_classes
 
-        self.is_train_once = True
 
 
     def test(self, data):
         pass
 
     def predict(self, data):
-        if self.is_train_once :
+        if len(self.datas) != 0:
             score = []
             for x in range(0,len(self.datas)):
                 score.append( [scipyDistance.euclidean( data, self.datas[x] ),x] )
