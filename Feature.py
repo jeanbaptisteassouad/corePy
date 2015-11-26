@@ -16,7 +16,9 @@ class Feature(object):
         return cv2.erode(matriceTmp, kernel, iterations=itera)
 
     def projection_histogram(self,img,gray):
-        matrice = cv2.Canny(gray, 150, 255, apertureSize=3)
+        # matrice = cv2.Canny(gray, 150, 255, apertureSize=3)
+        ret, matrice = cv2.threshold(gray,150,255,cv2.THRESH_BINARY)
+        matrice = cv2.Laplacian(matrice, cv2.CV_8U)
 
         kernel = np.matrix('1; 1; 1')
         matriceVerti = self.__ouverture(matrice,kernel,10)
@@ -78,8 +80,8 @@ def main():
     img = cv2.imread('core/test.png')
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     histo = f.projection_histogram(img,gray)
-    # plt.plot( histo )
-    # plt.show()
+    plt.plot( histo )
+    plt.show()
     pass
 
 if __name__ == '__main__':
