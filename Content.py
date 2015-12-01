@@ -284,6 +284,13 @@ class Tree(object):
         self.list_number_line_subtree = []
         self.list_number_col_subtree = []
 
+    def return_leafs(self, leaf_list):
+        if self.list_subtree == []:
+            leaf_list.append(self)
+        else:
+            for x in range(0,len(self.list_subtree)):
+                self.list_subtree[x].return_leafs(leaf_list)
+                pass
 
     def display_only_leaf_cv2(self,matrice):
         if self.list_subtree == []:
