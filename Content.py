@@ -2,6 +2,10 @@ import numpy as np
 import multiprocessing as mp
 import cv2
 import matplotlib.pyplot as plt
+import subprocess
+
+
+csv = []
 
 class Content(object):
     """docstring for Content"""
@@ -281,8 +285,9 @@ class Tree(object):
         self.frame = frame
         self.number_of_subframe = 0
         self.list_subtree = []
-        self.list_number_line_subtree = []
-        self.list_number_col_subtree = []
+        self.coresX = []
+        self.coresY = []
+
 
     def return_leafs(self, leaf_list):
         if self.list_subtree == []:
@@ -334,45 +339,88 @@ class Tree(object):
                                   self.frame[0][0])
 
 
-    def compute_layout_table(self):
+    def __tranf_tree_leaf_to_array(self):
         if self.list_subtree == []:
-            return  [0,0]
+            return [self.frame]
         else:
-            self.list_number_line_subtree = []
-            self.list_number_col_subtree = []
-            list_number_line = []
-            list_number_col = []
+            ans = []
             for x in range(0,len(self.list_subtree)):
-                if x == 0:
-                    list_number_line.append( self.list_subtree[x].frame[0][1] )
-                    list_number_col.append( self.list_subtree[x].frame[0][0] )
-                elif self.list_subtree[x].frame[0][1] > list_number_line[len(list_number_line)-1]:
-                    list_number_line.append( self.list_subtree[x].frame[0][1] )
-                elif self.list_subtree[x].frame[0][0] > list_number_col[len(list_number_col)-1]:
-                    list_number_col.append( self.list_subtree[x].frame[0][0] )
+                ans += self.list_subtree[x].__tranf_tree_leaf_to_array()
                 pass
-            ans = [len(list_number_line) , len(list_number_col)]
-            for x in range(0,len(self.list_subtree)):
-                tmp = self.list_subtree[x].compute_layout_table()
-                self.list_number_line_subtree.append( tmp[0] )
-                self.list_number_col_subtree.append( tmp[1] )
-
-            tmp = 0
-            for x in range(0,len(self.list_number_line_subtree)):
-                tmp = max(tmp, self.list_number_line_subtree[x])
-                pass
-            if tmp != 0:
-                ans[0] += tmp - 1
-
-            tmp = 0
-            for x in range(0,len(self.list_number_col_subtree)):
-                tmp = max(tmp, self.list_number_col_subtree[x])
-                pass
-            if tmp != 0:
-                ans[1] += tmp - 1
-
             return ans
+        pass
 
+    def __is_in(self,elem,array):
+        if array == []:
+            return False
+            pass
+        for x in range(0,len(array)):
+            if elem == array[x]:
+                return True
+        return False
+
+    def compute_cores(self):
+        listFrame = self.__tranf_tree_leaf_to_array()
+        self.coresX = []
+        self.coresY = []
+        for x in range(0,len(listFrame)):
+            if not self.__is_in(listFrame[x][0][0],self.coresX) :
+                self.coresX.append(listFrame[x][0][0])
+            if not self.__is_in(listFrame[x][0][1],self.coresY) :
+                self.coresY.append(listFrame[x][0][1])
+
+        self.coresX.sort()
+        self.coresY.sort()
+
+
+    def __getIndice(self,x,y,coresX,coresY):
+        ansX = -1
+        ansY = -1
+        for i in range(0,len(coresX)):
+            if coresX[i] == x:
+                ansX = i
+                break
+
+        for i in range(0,len(coresY)):
+            if coresY[i] == y:
+                ansY = i
+                break
+
+        return ansX,ansY
+
+
+
+    def __apply_ocr(self,coresX,coresY,image):
+        global csv
+        if self.list_subtree == []:
+            #OCR de la frame
+            subimage = image[self.frame[0][1]:self.frame[1][1],self.frame[0][0]:self.frame[1][0]]
+            cv2.imwrite("tmp.tiff",subimage)
+            # Subprocess
+            subprocess.call(['tesseract', 'tmp.tiff', 'output'])
+            with open('output.txt') as f:
+                text = f.read()
+            x,y = self.__getIndice(self.frame[0][0],self.frame[0][1],coresX,coresY)
+            csv[y][x] = text
+        else:
+            for x in range(0,len(self.list_subtree)):
+                self.list_subtree[x].__apply_ocr(coresX,coresY,image)
+
+
+
+    def ocr_me(self,image):
+        global csv
+        csv = []
+        for y in range(0,len(self.coresY)):
+            csv.append( [] )
+            for x in range(0,len(self.coresX)):
+                csv[y].append( "" )
+                pass
+            pass
+
+        self.__apply_ocr(self.coresX,self.coresY,image)
+        print csv
+        pass
 
 
 def main():

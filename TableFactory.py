@@ -49,19 +49,12 @@ class TableFactory(object):
 
 def main():
     C = Content()
-    T = TableFactory("core/table3.png",C.paris_dichotomie)
+    T = TableFactory("core/table2.png",C.paris_dichotomie)
     T.tree_of_content.remove_useless_leaf()
     T.tree_of_content.sort_subtree_by_frame()
 
-    leafs = []
-    T.tree_of_content.return_leafs(leafs)
-
-    for elt in leafs:
-        print(elt)
-        cv2.imshow("image",T.image[elt.frame[0][1]:elt.frame[1][1],elt.frame[0][0]:elt.frame[1][0]])
-        cv2.waitKey()
-
-    # print T.tree_of_content.compute_layout_table()
+    T.tree_of_content.compute_cores()
+    T.tree_of_content.ocr_me(T.image)
     # print T.tree_of_content.list_number_line_subtree
     # print T.tree_of_content.list_number_col_subtree
     T.drawing_image_cv2()
