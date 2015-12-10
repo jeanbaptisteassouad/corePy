@@ -3,8 +3,14 @@ import os
 import scipy.spatial.distance as scipyDistance
 import cv2
 import numpy as np
+from Feature import Feature
+import random
 
 def image_to_list(image):
+	# f = Feature()
+	# gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+	# return f.projection_histogram(image,gray)
+
 	ans = np.zeros( 3*len(image)*len(image[0]) )
 	cpt = 0
 	for y in range(0,len(image)):
@@ -18,6 +24,7 @@ def image_to_list(image):
 			pass
 		pass
 	return ans
+
 
 
 def computeVariance(listImageAlreadyUse,newOne):
@@ -41,7 +48,7 @@ def computeVariance(listImageAlreadyUse,newOne):
 	variance /= len(ans)
 	variance = pow(variance,0.5)
 
-	return moy*variance
+	return moy
 
 def get_training_image(path):
 	listImageAlreadyUse = []
@@ -51,7 +58,10 @@ def get_training_image(path):
 	for filename in os.listdir(path):
 		listNameFile.append( filename )
 
+	random.shuffle(listNameFile)
+
 	for x in range(0,len(listNameFile)):
+		print lastVariance
 		if x==0:
 			listImageAlreadyUse.append( [image_to_list( cv2.imread(path+listNameFile[x]) ) , x] )
 		else:
@@ -62,7 +72,7 @@ def get_training_image(path):
 				lastVariance = newVariance
 				listImageAlreadyUse.append( [imageTmp , x] )
 				pass
-
+	print lastVariance
 	# print len(listImageAlreadyUse)
 	ans = []
 	for x in range(0,len(listImageAlreadyUse)):
