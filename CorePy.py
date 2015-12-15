@@ -112,20 +112,20 @@ def main():
     K = Kppv()
     Core = CorePy("",K)
 
-    list_path_training = auto_pick_train.get_training_image("png/20/HPC-T4-2013-GearsAndSprockets-GB/")
-    # Training
-    for x in range(0,len(list_path_training)):
-        functionTestTraining("png/500/HPC-T4-2013-GearsAndSprockets-GB/"+list_path_training[x],Core,F,C)
-        pass
+    # list_path_training = auto_pick_train.get_training_image("png/20/HPC-T4-2013-GearsAndSprockets-GB/")
+    # # Training
+    # for x in range(0,len(list_path_training)):
+    #     functionTestTraining("png/500/HPC-T4-2013-GearsAndSprockets-GB/"+list_path_training[x],Core,F,C)
+    #     pass
 
 
 
-    Core.predictor.serialize()
-    # Core.predictor.deserialize()
+    # Core.predictor.serialize()
+    Core.predictor.deserialize()
 
-    # # Find table and Check
-    # for filename in os.listdir("png/500/HPC-T4-2013-GearsAndSprockets-GB/"):
-    #     functionTestExtractTable("png/500/HPC-T4-2013-GearsAndSprockets-GB/"+filename,Core,F,C)
+    # Find table and Check
+    for filename in os.listdir("png/500/HPC-T4-2013-GearsAndSprockets-GB/"):
+        functionTestExtractTable("png/500/HPC-T4-2013-GearsAndSprockets-GB/"+filename,Core,F,C)
 
     pass
 

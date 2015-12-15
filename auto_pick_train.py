@@ -83,8 +83,85 @@ def get_training_image(path):
 	return ans
 
 
+def get_median_len(listNameFile,path):
+	listDistance = []
+	for x in range(0,len(listNameFile)):
+		print x
+		listImage = image_to_list( cv2.imread(path+listNameFile[x]) )
+		for y in range(x,len(listNameFile)):
+			if y!=x:
+				listImageTmp = image_to_list( cv2.imread(path+listNameFile[y]) )
+				listDistance.append( scipyDistance.euclidean(listImageTmp , listImage) )
+				pass
+			pass
+		pass
+
+	listDistance.sort()
+	return listDistance[len(listDistance)/2 - 1]
+	# return sum(listDistance)/float(len(listDistance))
+
+def build_epsilon_network(epsilon,listNameFile,path):
+	listEpsilonNetwork = []
+	for x in range(0,len(listNameFile)):
+		listImage = image_to_list( cv2.imread(path+listNameFile[x]) )
+		shouldAdd = True
+		for y in range(0,len(listEpsilonNetwork)):
+			tmp = scipyDistance.euclidean(listEpsilonNetwork[y][0] , listImage)
+			if tmp < epsilon:
+				shouldAdd = False
+				break
+		if shouldAdd:
+			listEpsilonNetwork.append([listImage,x])
+			pass
+
+	return listEpsilonNetwork
+
+def check_epsilon_network(listEpsilonNetwork,epsilon,listNameFile,path):
+	print "Check intern distance"
+	for x in range(0,len(listEpsilonNetwork)):
+		for y in range(x,len(listEpsilonNetwork)):
+			if x!=y:
+				if scipyDistance.euclidean(listEpsilonNetwork[y][0],listEpsilonNetwork[x][0]) < epsilon:
+					return False
+	print "Check succeed"
+	pass
+
+def number_under_epsilon(listEpsilonNetwork,epsilon,listNameFile,path):
+	for x in range(0,len(listEpsilonNetwork)):
+		cpt = 0
+		for y in range(0,len(listNameFile)):
+			listImage = image_to_list( cv2.imread(path+listNameFile[y]) )
+			tmp = scipyDistance.euclidean(listEpsilonNetwork[x][0] , listImage)
+			if tmp < epsilon and tmp != 0:
+				cpt += 1
+		listEpsilonNetwork[x].append(cpt)
+
+	return listEpsilonNetwork
+
+
+def test(path):
+	listNameFile = []
+	for filename in os.listdir(path):
+		listNameFile.append( filename )
+
+	random.shuffle(listNameFile)
+
+	# print get_median_len(listNameFile,path)
+	listEpsilonNetwork = build_epsilon_network( 1484 ,listNameFile,path)
+
+	# check_epsilon_network(listEpsilonNetwork, 1484 ,listNameFile,path)
+
+	listEpsilonNetwork = number_under_epsilon(listEpsilonNetwork, 1484 ,listNameFile,path)
+
+	for x in range(0,len(listEpsilonNetwork)):
+		print listNameFile[ listEpsilonNetwork[x][1] ], listEpsilonNetwork[x][2]
+		pass
+
+	pass
+
 def main():
-	print get_training_image("png/10/HPC-T4-2013-GearsAndSprockets-GB/")
+	# print get_training_image("png/10/HPC-T4-2013-GearsAndSprockets-GB/")
+	test("png/10/HPC-T4-2013-GearsAndSprockets-GB/")
 
 
 if __name__ == '__main__':
