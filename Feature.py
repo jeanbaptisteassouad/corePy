@@ -1,6 +1,10 @@
 import cv2
 import numpy as np
 
+LEN_FEATURE = 500
+
+
+
 class Feature(object):
     """docstring for Feature"""
     def __init__(self):
@@ -32,25 +36,28 @@ class Feature(object):
 
         # cv2.imshow('image', matriceHori)
         # cv2.waitKey(0)
-        features = np.zeros(100*5)
+        features = np.zeros(LEN_FEATURE)
         height, width = matrice.shape
         cptFeatures = 0
         # Blue
-        ans = cv2.calcHist([img], [0], None, [100], [20, 236])
+        ans = cv2.calcHist([img], [0], None, [100], [0, 255])
         for x in range(0, len(ans)):
-            features[cptFeatures] = 100*ans[x][0]/float(height*width)
+            #features[cptFeatures] = 100*ans[x][0]/float(height*width)
+            features[cptFeatures] = ans[x][0]
             cptFeatures += 1
             pass
         # Green
-        ans = cv2.calcHist([img], [1], None, [100], [20, 236])
+        ans = cv2.calcHist([img], [1], None, [100], [0, 255])
         for x in range(0, len(ans)):
-            features[cptFeatures] = 100*ans[x][0]/float(height*width)
+            #features[cptFeatures] = 100*ans[x][0]/float(height*width)
+            features[cptFeatures] = ans[x][0]
             cptFeatures += 1
             pass
         # Red
-        ans = cv2.calcHist([img], [2], None, [100], [20, 236])
+        ans = cv2.calcHist([img], [2], None, [100], [0, 255])
         for x in range(0, len(ans)):
-            features[cptFeatures] = 100*ans[x][0]/float(height*width)
+            #features[cptFeatures] = 100*ans[x][0]/float(height*width)
+            features[cptFeatures] = ans[x][0]
             cptFeatures += 1
             pass
         # Ligne Horizontal and Vertical not in the same histo
@@ -60,15 +67,17 @@ class Feature(object):
                 ans[i] += matriceHori[i][j]
                 ans[j + height] += matriceVerti[i][j]
         ##### Horizontal
-        hist = np.histogram(ans[0:height], bins=100, range=(255, 255*width))[0]
+        hist = np.histogram(ans[0:height], bins=100, range=(255, 255*500))[0]
         for x in range(0, len(hist)):
-            features[cptFeatures] = 100*hist[x]/float(width)
+            #features[cptFeatures] = 100*hist[x]/float(width)
+            features[cptFeatures] = hist[x]*1000
             cptFeatures += 1
             pass
         ##### Vertical
-        hist = np.histogram(ans[height:height + width], bins=100, range=(255, 255*height))[0]
+        hist = np.histogram(ans[height:height + width], bins=100, range=(255, 255*500))[0]
         for x in range(0, len(hist)):
-            features[cptFeatures] = 100*hist[x]/float(height)
+            #features[cptFeatures] = 100*hist[x]/float(height)
+            features[cptFeatures] = hist[x]*1000
             cptFeatures += 1
             pass
 

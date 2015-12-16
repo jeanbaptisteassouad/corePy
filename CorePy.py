@@ -2,6 +2,7 @@ import numpy as np
 import cv2
 import auto_pick_train
 import os
+import pickle
 
 class CorePy(object):
     """docstring for CorePy"""
@@ -112,15 +113,50 @@ def main():
     K = Kppv()
     Core = CorePy("",K)
 
-    # list_path_training = auto_pick_train.get_training_image("png/20/HPC-T4-2013-GearsAndSprockets-GB/")
-    # # Training
-    # for x in range(0,len(list_path_training)):
-    #     functionTestTraining("png/500/HPC-T4-2013-GearsAndSprockets-GB/"+list_path_training[x],Core,F,C)
-    #     pass
+    listNameFile = []
+    for filename in os.listdir("png/500/HPC-T4-2013-GearsAndSprockets-GB/"):
+        listNameFile.append( filename )
+
+    # random.shuffle(listNameFile)
+
+    # ans = []
+    # for i in range(0,len(listNameFile)):
+    #     print i
+    #     Core.image_current = ImageFactory("png/500/HPC-T4-2013-GearsAndSprockets-GB/"+listNameFile[i],F.projection_histogram,C.new_leuven_dichotomie)
+    #     Core.image_current.extract_feature_for_all_content()
+    #     for j in range(0,len(Core.image_current.list_feature)):
+    #         ans.append( [Core.image_current.list_feature[j],listNameFile[i]] )
+    #         pass
+
+    # f = open('ans.pickle', 'wb')
+    # pickle.dump(ans, f, protocol=2)
+    # f.close()
+
+
+    f = open('ans.pickle', 'rb')
+    ans = pickle.load(f)
+    f.close()
+
+
+    ans = auto_pick_train.epsilon_net(70000,ans)
+
+    newName = ans
 
 
 
-    # Core.predictor.serialize()
+
+
+    # list_path_training = auto_pick_train.test("png/20/HPC-T4-2013-GearsAndSprockets-GB/")
+    # Training
+    for x in range(0,len(newName)):
+        functionTestTraining("png/500/HPC-T4-2013-GearsAndSprockets-GB/"+newName[x],Core,F,C)
+        pass
+
+
+
+    Core.predictor.serialize()
+
+
     Core.predictor.deserialize()
 
     # Find table and Check
@@ -135,5 +171,6 @@ if __name__ == '__main__':
     from ImageFactory import ImageFactory
     from Feature import Feature
     from Content import Content
+    import random
     main()
 

@@ -3,16 +3,18 @@ from Predictor import Predictor
 import numpy as np
 import scipy.spatial.distance as scipyDistance
 
+LEN_FEATURE = 500
+
 class Kppv(Predictor):
     """docstring for Kppv"""
     def __init__(self):
         super(Kppv, self).__init__()
-        self.k = 1
+        self.k = 4
 
 
 
     def train(self, datas, classes):
-        new_datas = np.resize( self.datas, (len(self.datas)+len(datas),500) )
+        new_datas = np.resize( self.datas, (len(self.datas)+len(datas),LEN_FEATURE) )
         new_datas[0:len(self.datas)] = self.datas
         new_datas[len(self.datas):len(self.datas)+len(datas)] = datas
         self.datas = new_datas

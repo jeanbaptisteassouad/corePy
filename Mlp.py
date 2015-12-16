@@ -5,6 +5,8 @@ from keras.layers.core import Dense, Dropout, Activation
 from keras.optimizers import SGD
 import numpy as np
 
+LEN_FEATURE = 500
+
 class Mlp(Predictor):
     """docstring for Mlp"""
     def __init__(self, config=None):
@@ -13,7 +15,7 @@ class Mlp(Predictor):
             self.__model = Sequential()
             # Dense(64) is a fully-connected layer with 64 hidden units.
             # in the first layer, you must specify the expected input data shape
-            self.__model.add(Dense(128, input_dim=500, init='uniform'))
+            self.__model.add(Dense(128, input_dim=LEN_FEATURE, init='uniform'))
             self.__model.add(Activation('tanh'))
             self.__model.add(Dropout(0.5))
             self.__model.add(Dense(128, init='uniform'))
@@ -35,7 +37,7 @@ class Mlp(Predictor):
             pass
 
     def train(self, datas, classes):
-        new_datas = np.resize( self.datas, (len(self.datas)+len(datas),500) )
+        new_datas = np.resize( self.datas, (len(self.datas)+len(datas),LEN_FEATURE) )
         new_datas[0:len(self.datas)] = self.datas
         new_datas[len(self.datas):len(self.datas)+len(datas)] = datas
         self.datas = new_datas
