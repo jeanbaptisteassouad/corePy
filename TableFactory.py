@@ -1,7 +1,7 @@
 import pickle
 import cv2
 import numpy as np
-
+import re
 
 class TableFactory(object):
     """docstring for TableFactory"""
@@ -48,13 +48,30 @@ class TableFactory(object):
 
 
 def main():
+
+
     C = Content()
-    T = TableFactory("core/table2.png",C.paris_dichotomie)
+    T = TableFactory("core/table4.png",C.paris_dichotomie)
     T.tree_of_content.remove_useless_leaf()
     T.tree_of_content.sort_subtree_by_frame()
 
     T.tree_of_content.compute_cores()
-    T.tree_of_content.ocr_me(T.image)
+    csv = T.tree_of_content.ocr_me(T.image)
+
+    f = open("ans.csv",'w')
+    for y in range(0,len(csv)):
+        for x in range(0,len(csv[y])):
+            if x == 0:
+                f.write( re.sub('\n|;','',csv[y][x]) )
+            else:
+                f.write(";")
+                f.write( re.sub('\n|;','',csv[y][x]) )
+            pass
+        f.write("\n")
+        pass
+    f.close()
+
+
     # print T.tree_of_content.list_number_line_subtree
     # print T.tree_of_content.list_number_col_subtree
     T.drawing_image_cv2()
