@@ -2,6 +2,7 @@ import pickle
 import cv2
 import numpy as np
 
+LEN_FEATURE = 500
 
 class ImageFactory(object):
     """docstring for ImageFactory"""
@@ -21,7 +22,7 @@ class ImageFactory(object):
         self.list_classes = np.array([])
 
     def extract_feature_for_all_content(self):
-        self.list_feature = np.zeros( (len(self.list_content),500) )
+        self.list_feature = np.zeros( (len(self.list_content),LEN_FEATURE) )
         for x in range(0,len(self.list_content)):
             content_image = self.image[self.list_content[x][0][1]:self.list_content[x][1][1]+1, self.list_content[x][0][0]:self.list_content[x][1][0]+1]
             content_gray = self.gray[self.list_content[x][0][1]:self.list_content[x][1][1]+1, self.list_content[x][0][0]:self.list_content[x][1][0]+1]

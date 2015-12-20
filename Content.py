@@ -93,7 +93,7 @@ class Content(object):
         return
 
     # Extract Table from a pdf page
-    def new_leuven_dichotomie(self,image, gray, deep=10):
+    def new_leuven_dichotomie(self,image, gray, deep=2):
         height,width,channel = image.shape
         frame = [(0,0) , (width-1,height-1)]
 
