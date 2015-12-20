@@ -395,7 +395,22 @@ class Tree(object):
         if self.list_subtree == []:
             #OCR de la frame
             subimage = image[self.frame[0][1]:self.frame[1][1],self.frame[0][0]:self.frame[1][0]]
-            cv2.imwrite("tmp.tiff",subimage)
+            height,width,channel = subimage.shape
+            buf = 10
+            subimage_ext = np.zeros((height + 2*buf,width + 2*buf,channel))
+            for y in range(0,height + 2*buf):
+                for x in range(0,width + 2*buf):
+                    if y < buf or y > height + buf - 1 or x < buf or x > width + buf - 1:
+                        subimage_ext[y][x][0] = 255
+                        subimage_ext[y][x][1] = 255
+                        subimage_ext[y][x][2] = 255
+                    else:
+                        subimage_ext[y][x][0] = subimage[y-buf][x-buf][0]
+                        subimage_ext[y][x][1] = subimage[y-buf][x-buf][1]
+                        subimage_ext[y][x][2] = subimage[y-buf][x-buf][2]
+                    pass
+                pass
+            cv2.imwrite("tmp.tiff",subimage_ext)
             # Subprocess
             subprocess.call(['tesseract', 'tmp.tiff', 'output'])
             with open('output.txt') as f:
@@ -420,6 +435,7 @@ class Tree(object):
 
         self.__apply_ocr(self.coresX,self.coresY,image)
         print csv
+        return csv
         pass
 
 

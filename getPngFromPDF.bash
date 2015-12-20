@@ -34,5 +34,5 @@ convertAllPdf()
 # List all the ppi needed
 
 convertAllPdf 500
-convertAllPdf 50
+convertAllPdf 20
 
