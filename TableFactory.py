@@ -74,9 +74,9 @@ def main():
 
     # print T.tree_of_content.list_number_line_subtree
     # print T.tree_of_content.list_number_col_subtree
-    # T.drawing_image_cv2()
-    # cv2.imshow("Image", T.image_display)
-    # cv2.waitKey(0)
+    T.drawing_image_cv2()
+    cv2.imshow("Image", T.image_display)
+    cv2.waitKey(0)
     pass
 
 

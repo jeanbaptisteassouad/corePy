@@ -95,7 +95,7 @@ class Content(object):
     # Extract Table from a pdf page
     def new_leuven_dichotomie(self,image, gray, deep=2):
         height,width,channel = image.shape
-        frame = [(0,0) , (width-1,height-1)]
+        frame = [(0,0), (width-1,height-1)]
 
         # return self.__new_leuven_dichotomie_recursive(gray, deep, frame)
 
@@ -107,8 +107,16 @@ class Content(object):
         if len(dichoArray) == 1 and dichoArray[0] == frame:
             return [frame]
 
+        cpu_cores = mp.cpu_count()
+        tasks = mp.JoinableQueue()
         output = mp.Queue()
-        processes = [mp.Process( target=self.__new_leuven_dichotomie_recursive_multiprocessing, args=(gray, deep-1, dichoArray[x], output) ) for x in range(0,len(dichoArray))]
+
+        print("dichoArray length : "+str(len(dichoArray)))
+
+        for x in range(0, len(dichoArray)):
+            tasks.put((gray, deep-1, dichoArray[x]))
+
+        processes = [mp.Process(target=self.worker, args=(x, tasks, output)) for x in range(0,cpu_cores)]
         for process in processes:
             process.start()
         res = []
@@ -116,6 +124,17 @@ class Content(object):
             res += output.get()
 
         return res
+
+    def worker(self,x, qtask, output):
+        data = []
+        while True:
+            if qtask.empty():
+                break
+            args = qtask.get()
+            data += self.__new_leuven_dichotomie_recursive(args[0],args[1], args[2])
+            qtask.task_done()
+        output.put(data)
+        pass
 
 
     def __ouverture(self,matrice,kernel, itera):
@@ -297,7 +316,7 @@ except:
 tesseract.TessVersion.restype = ctypes.c_char_p
 tesseract_version = tesseract.TessVersion()
 
-print("Found tesseract-ocr library version %s." % tesseract_version)
+# print("Found tesseract-ocr library version %s." % tesseract_version)
 api = tesseract.TessBaseAPICreate()
 
 rc = tesseract.TessBaseAPIInit3(api, tessdata, lang)
