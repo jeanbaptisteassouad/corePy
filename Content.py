@@ -113,7 +113,7 @@ class Content(object):
         output = []
         processes = []
 
-        # print("dichoArray length : "+str(len(dichoArray)))
+        print("dichoArray length : "+str(len(dichoArray)))
 
         for x in range(0, len(dichoArray)):
             tasks.put((gray, deep-1, dichoArray[x]))
@@ -126,15 +126,14 @@ class Content(object):
             processes.append(process)
             # start process
             process.start()
-
-        for x in range(0,cpu_cores):
-            processes[x].join()
-        tasks.join()
         # get output
         res = []
         for x in range(0,cpu_cores):
             res += output[x].get()
-
+            output[x].close()
+        for x in range(0,cpu_cores):
+            processes[x].join()
+        print("Finished ...")
         return res
 
     def worker(self,x, qtask, output):
