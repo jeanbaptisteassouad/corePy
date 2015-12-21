@@ -108,20 +108,32 @@ class Content(object):
             return [frame]
 
         cpu_cores = mp.cpu_count()
-        tasks = mp.JoinableQueue()
-        output = mp.Queue()
 
-        print("dichoArray length : "+str(len(dichoArray)))
+        tasks = mp.JoinableQueue()
+        output = []
+        processes = []
+
+        # print("dichoArray length : "+str(len(dichoArray)))
 
         for x in range(0, len(dichoArray)):
             tasks.put((gray, deep-1, dichoArray[x]))
 
-        processes = [mp.Process(target=self.worker, args=(x, tasks, output)) for x in range(0,cpu_cores)]
-        for process in processes:
+        for x in range(0,cpu_cores):
+            out = mp.JoinableQueue()
+            output.append(out)
+            # run process and append to process list
+            process = mp.Process(target=self.worker, args=(x, tasks, out))
+            processes.append(process)
+            # start process
             process.start()
+
+        for x in range(0,cpu_cores):
+            processes[x].join()
+        tasks.join()
+        # get output
         res = []
-        for process in processes:
-            res += output.get()
+        for x in range(0,cpu_cores):
+            res += output[x].get()
 
         return res
 
