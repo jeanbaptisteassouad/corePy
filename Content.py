@@ -276,10 +276,52 @@ class Content(object):
         # cv2.waitKey(0)
         return tree_of_frames
 
+# ------------------------------------------------
+# TESSERACT API CALLS
+import ctypes
+# from ctypes import pythonapi, util, py_object
+lang = "eng"
+output = "dump.config"
+# filename = "test/table.png"
+libpath = "/usr/local/lib/"
+tessdata = "/usr/local/share/"
+
+libname = libpath + "libtesseract.so.3.0.2"
+libname_alt = "libtesseract.so.3"
+
+try:
+    tesseract = ctypes.cdll.LoadLibrary(libname)
+except:
+    tesseract = ctypes.cdll.LoadLibrary(libname_alt)
+
+tesseract.TessVersion.restype = ctypes.c_char_p
+tesseract_version = tesseract.TessVersion()
+
+print("Found tesseract-ocr library version %s." % tesseract_version)
+api = tesseract.TessBaseAPICreate()
+
+rc = tesseract.TessBaseAPIInit3(api, tessdata, lang)
+if (rc):
+    tesseract.TessBaseAPIDelete(api)
+    print("Could not initialize tesseract.\n")
+    exit(3)
+
+# img = cv2.imread(filename)
+# subimage = img[0:100][0:70]
+# height, width, channels = subimage.shape
+# print(str(height)+", "+str(width))
+# bytesPerPixel = channels
+#
+# data = str(subimage.data)
+#
+# tess_set_image = tesseract.TessBaseAPISetImage(api, data, width, height, bytesPerPixel, bytesPerPixel*width)
+# text_out = tesseract.TessBaseAPIGetUTF8Text(api)
+# result = ctypes.string_at(text_out)
+# print(result)
+# END OF TESSERACT API CALLS
 
 
 class Tree(object):
-    """docstring for Tree"""
     def __init__(self, frame):
         super(Tree, self).__init__()
         self.frame = frame
@@ -287,7 +329,6 @@ class Tree(object):
         self.list_subtree = []
         self.coresX = []
         self.coresY = []
-
 
     def return_leafs(self, leaf_list):
         if self.list_subtree == []:
@@ -329,7 +370,7 @@ class Tree(object):
         if self.list_subtree == []:
             return
         else:
-            self.list_subtree.sort( key=lambda a: (a.frame[0][1],a.frame[0][0]) )
+            self.list_subtree.sort(key=lambda a: (a.frame[0][1],a.frame[0][0]))
             for x in range(0,len(self.list_subtree)):
                 self.list_subtree[x].sort_subtree_by_frame()
 
@@ -337,7 +378,6 @@ class Tree(object):
         return '{}: y={} x={}'.format(self.__class__.__name__,
                                   self.frame[0][1],
                                   self.frame[0][0])
-
 
     def __tranf_tree_leaf_to_array(self):
         if self.list_subtree == []:
@@ -364,14 +404,13 @@ class Tree(object):
         self.coresX = []
         self.coresY = []
         for x in range(0,len(listFrame)):
-            if not self.__is_in(listFrame[x][0][0],self.coresX) :
+            if not self.__is_in(listFrame[x][0][0],self.coresX):
                 self.coresX.append(listFrame[x][0][0])
-            if not self.__is_in(listFrame[x][0][1],self.coresY) :
+            if not self.__is_in(listFrame[x][0][1],self.coresY):
                 self.coresY.append(listFrame[x][0][1])
 
         self.coresX.sort()
         self.coresY.sort()
-
 
     def __getIndice(self,x,y,coresX,coresY):
         ansX = -1
@@ -388,16 +427,15 @@ class Tree(object):
 
         return ansX,ansY
 
-
-
     def __apply_ocr(self,coresX,coresY,image):
         global csv
         if self.list_subtree == []:
-            #OCR de la frame
+            # OCR de la frame
             subimage = image[self.frame[0][1]:self.frame[1][1],self.frame[0][0]:self.frame[1][0]]
             height,width,channel = subimage.shape
             buf = 10
-            subimage_ext = np.zeros((height + 2*buf,width + 2*buf,channel))
+            subimage_ext = np.zeros((height+2*buf, width+2*buf, channel), np.uint8)
+            #subimage_ext = np.zeros((height + 2*buf,width + 2*buf,channel))
             for y in range(0,height + 2*buf):
                 for x in range(0,width + 2*buf):
                     if y < buf or y > height + buf - 1 or x < buf or x > width + buf - 1:
@@ -410,38 +448,42 @@ class Tree(object):
                         subimage_ext[y][x][2] = subimage[y-buf][x-buf][2]
                     pass
                 pass
-            cv2.imwrite("tmp.tiff",subimage_ext)
-            # Subprocess
-            subprocess.call(['tesseract', 'tmp.tiff', 'output'])
-            with open('output.txt') as f:
-                text = f.read()
+            height, width, channels = subimage_ext.shape
+            # print(str(height)+", "+str(width))
+            bytesPerPixel = channels
+
+            data = str(subimage_ext.data)
+
+            # set tesseract image
+            tesseract.TessBaseAPISetImage(api, data, width, height, bytesPerPixel, bytesPerPixel*width)
+            text_out = tesseract.TessBaseAPIGetUTF8Text(api)
+            # get text
+            text = ctypes.string_at(text_out)
             x,y = self.__getIndice(self.frame[0][0],self.frame[0][1],coresX,coresY)
             csv[y][x] = text
         else:
             for x in range(0,len(self.list_subtree)):
                 self.list_subtree[x].__apply_ocr(coresX,coresY,image)
 
-
-
     def ocr_me(self,image):
         global csv
         csv = []
         for y in range(0,len(self.coresY)):
-            csv.append( [] )
+            csv.append([])
             for x in range(0,len(self.coresX)):
-                csv[y].append( "" )
+                csv[y].append("")
                 pass
             pass
 
         self.__apply_ocr(self.coresX,self.coresY,image)
-        print csv
+        # print(csv)
         return csv
         pass
 
 
 def main():
-    C = Content()
     pass
 
 if __name__ == '__main__':
     main()
+
