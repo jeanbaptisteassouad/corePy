@@ -314,7 +314,7 @@ lang = "eng"
 output = "dump.config"
 # filename = "test/table.png"
 libpath = "/usr/local/lib/"
-tessdata = "/usr/local/share/"
+tessdata = "/usr/share/tesseract-ocr/tessdata/"
 
 libname = libpath + "libtesseract.so.3.0.2"
 libname_alt = "libtesseract.so.3"

@@ -51,7 +51,7 @@ def main():
 
 
     C = Content()
-    T = TableFactory("core/table.png",C.paris_dichotomie)
+    T = TableFactory("core/testTable.png",C.paris_dichotomie)
     T.tree_of_content.remove_useless_leaf()
     T.tree_of_content.sort_subtree_by_frame()
 
