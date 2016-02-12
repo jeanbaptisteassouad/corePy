@@ -125,6 +125,7 @@ def main2():
 		tmp_page_dimension = re.findall("<page width=\"([^\"]*)\" height=\"([^\"]*)\">",pages_bbox[page_iterator])
 		page_width = tmp_page_dimension[0][0]
 		page_height = tmp_page_dimension[0][1]
+
 		#On garde les lignes ou il y au moins la moitier de chiffres
 		table = miner_keepOnlyNumericLine(pages_layout[page_iterator])
 
@@ -163,28 +164,33 @@ def main2():
 			print re.findall("<word xMin=\"([^>]*)\" yMin=\""+str(yMin[get_the_good_yosh(lines_of_table[p],lines_bbox)])+"\" xMax=\"([^>]*)\" yMax=\"([^>]*)\">[^<]*</word>",pages_bbox[page_iterator])
 			exit(1)
 
-		# for line_iterator in range(0,len(lines_layout)):
-		# 	if lines_layout[line_iterator] != "":
-		# 		words = re.split(' *',lines_layout[line_iterator])
-		# 		tmp_words = []
-		# 		for word_iterator in range(0,len(words)):
-		# 			if words[word_iterator] != '':
-		# 				tmp_words.append(words[word_iterator])
-		# 		words = list(tmp_words)
-		# 		print words
-		# 		if len(words) >= 2:
-		# 			print "<word.*?>"+words[0]+"<.*?>"+words[len(words)-1]+"<.*?word>"
-		# 			current_line_bbox = re.findall("<word.*?>"+words[0]+"<.*?>"+words[len(words)-1]+"<.*?word>",pages_bbox[page_iterator],re.DOTALL)
-		# 		if len(words) == 1:
-		# 			current_line_bbox = re.findall("<word.*?>"+words[0]+"<.*?word>",pages_bbox[page_iterator],re.DOTALL)
-		# 		if current_line_bbox != []:
-		# 			current_line_bbox = current_line_bbox[0]
-		# 			print current_line_bbox
-		# 			xMin = min(re.findall("xMin=\"([^\"]*?)\"",current_line_bbox))
-		# 			yMin = min(re.findall("yMin=\"([^\"]*?)\"",current_line_bbox))
-		# 			xMax = max(re.findall("xMax=\"([^\"]*?)\"",current_line_bbox))
-		# 			yMax = max(re.findall("yMax=\"([^\"]*?)\"",current_line_bbox))
-		# 			print yMin
+
+# 		print pages_layout[page_iterator]
+
+# 		for line_iterator in range(0,len(lines_layout)):
+# 			if lines_layout[line_iterator] != "":
+# 				words = re.split(' *',lines_layout[line_iterator])
+# 				tmp_words = []
+# 				for word_iterator in range(0,len(words)):
+# 					if words[word_iterator] != '':
+# 						tmp_words.append(words[word_iterator])
+# 				words = list(tmp_words)
+# 				xMin = 0
+# 				yMin = 0
+# 				xMax = 0
+# 				yMax = 0
+# 				if len(words) >= 2:
+# 					current_line_bbox = re.findall("<word[^<>]*>"+words[0]+"<.*>"+words[len(words)-1]+"</word>",pages_bbox[page_iterator],re.DOTALL)
+# 				if len(words) == 1:
+# 					current_line_bbox = re.findall("<word[^<>]*>"+words[0]+"</word>",pages_bbox[page_iterator],re.DOTALL)
+# 				if current_line_bbox != []:
+# 					current_line_bbox = current_line_bbox[0]
+# 					xMin = float(min(re.findall("xMin=\"([^\"]*?)\"",current_line_bbox)))/float(page_width)
+# 					yMin = float(min(re.findall("yMin=\"([^\"]*?)\"",current_line_bbox)))/float(page_height)
+# 					xMax = float(max(re.findall("xMax=\"([^\"]*?)\"",current_line_bbox)))/float(page_width)
+# 					yMax = float(max(re.findall("yMax=\"([^\"]*?)\"",current_line_bbox)))/float(page_height)
+# 				print line_iterator,xMin,yMin,xMax,yMax
+
 
 
 		pass
