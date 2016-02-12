@@ -87,6 +87,24 @@ def main():
 	print pages[number_page]
 
 
+def get_the_good_yosh(line_of_table,yosh):
+	score = []
+	for x in range(0,len(yosh)):
+		score.append(0)
+		for y in range(0,len(yosh[x])):
+			score[x] += len(re.findall(" "+re.escape(yosh[x][y])+" "," "+line_of_table+" "))
+
+	indiceMax = 0
+	maxScore = -1
+
+	for x in range(0,len(score)):
+		if score[x] > maxScore:
+			maxScore = score[x]
+			indiceMax = x
+			pass
+		pass
+	return indiceMax
+
 
 def main2():
 	f = open('Hpc.html','r')
@@ -102,35 +120,71 @@ def main2():
 	pages_layout = re.split('\f',content)
 
 
-	for page_iterator in range(0,1):
+	for page_iterator in range(78,79):
 		lines_layout = re.split('\n',pages_layout[page_iterator])
 		tmp_page_dimension = re.findall("<page width=\"([^\"]*)\" height=\"([^\"]*)\">",pages_bbox[page_iterator])
 		page_width = tmp_page_dimension[0][0]
 		page_height = tmp_page_dimension[0][1]
-		print pages_bbox[page_iterator]
+		#On garde les lignes ou il y au moins la moitier de chiffres
+		table = miner_keepOnlyNumericLine(pages_layout[page_iterator])
 
-		for line_iterator in range(0,len(lines_layout)):
-			if lines_layout[line_iterator] != "":
-				words = re.split(' *',lines_layout[line_iterator])
-				tmp_words = []
-				for word_iterator in range(0,len(words)):
-					if words[word_iterator] != '':
-						tmp_words.append(words[word_iterator])
-				words = list(tmp_words)
-				print words
-				if len(words) >= 2:
-					print "<word.*?>"+words[0]+"<.*?>"+words[len(words)-1]+"<.*?word>"
-					current_line_bbox = re.findall("<word.*?>"+words[0]+"<.*?>"+words[len(words)-1]+"<.*?word>",pages_bbox[page_iterator],re.DOTALL)
-				if len(words) == 1:
-					current_line_bbox = re.findall("<word.*?>"+words[0]+"<.*?word>",pages_bbox[page_iterator],re.DOTALL)
-				if current_line_bbox != []:
-					current_line_bbox = current_line_bbox[0]
-					print current_line_bbox
-					xMin = min(re.findall("xMin=\"([^\"]*?)\"",current_line_bbox))
-					yMin = min(re.findall("yMin=\"([^\"]*?)\"",current_line_bbox))
-					xMax = max(re.findall("xMax=\"([^\"]*?)\"",current_line_bbox))
-					yMax = max(re.findall("yMax=\"([^\"]*?)\"",current_line_bbox))
-					print yMin
+		#On garde les lignes avec au moins 3 colonnes
+		table = miner_keepOnlyThreeAndMoreColumnsLine(table)
+
+
+
+		yMin = re.findall("yMin=\"([^\"]*?)\"",pages_bbox[page_iterator])
+
+
+		yMin_tmp = []
+		for p in range(0,len(yMin)):
+			isthere = False
+			for j in range(0,len(yMin_tmp)):
+				if yMin_tmp[j] == yMin[p]:
+					isthere = True
+					break
+			if isthere == False:
+				yMin_tmp.append(yMin[p])
+
+		yMin_tmp.sort()
+		yMin = list(yMin_tmp)
+
+		lines_bbox = []
+		for p in range(0,len(yMin)):
+			lines_bbox.append( re.findall("<word[^>]*yMin=\""+str(yMin[p])+"\"[^>]*>([^<]*)</word>",pages_bbox[page_iterator]) )
+			pass
+
+		lines_of_table = re.split("\n",table)
+
+		print pages_bbox[page_iterator]
+		for p in range(0,len(lines_of_table)):
+			print lines_of_table[p]
+			print yMin[get_the_good_yosh(lines_of_table[p],lines_bbox)], lines_bbox[get_the_good_yosh(lines_of_table[p],lines_bbox)]
+			print re.findall("<word xMin=\"([^>]*)\" yMin=\""+str(yMin[get_the_good_yosh(lines_of_table[p],lines_bbox)])+"\" xMax=\"([^>]*)\" yMax=\"([^>]*)\">[^<]*</word>",pages_bbox[page_iterator])
+			exit(1)
+
+		# for line_iterator in range(0,len(lines_layout)):
+		# 	if lines_layout[line_iterator] != "":
+		# 		words = re.split(' *',lines_layout[line_iterator])
+		# 		tmp_words = []
+		# 		for word_iterator in range(0,len(words)):
+		# 			if words[word_iterator] != '':
+		# 				tmp_words.append(words[word_iterator])
+		# 		words = list(tmp_words)
+		# 		print words
+		# 		if len(words) >= 2:
+		# 			print "<word.*?>"+words[0]+"<.*?>"+words[len(words)-1]+"<.*?word>"
+		# 			current_line_bbox = re.findall("<word.*?>"+words[0]+"<.*?>"+words[len(words)-1]+"<.*?word>",pages_bbox[page_iterator],re.DOTALL)
+		# 		if len(words) == 1:
+		# 			current_line_bbox = re.findall("<word.*?>"+words[0]+"<.*?word>",pages_bbox[page_iterator],re.DOTALL)
+		# 		if current_line_bbox != []:
+		# 			current_line_bbox = current_line_bbox[0]
+		# 			print current_line_bbox
+		# 			xMin = min(re.findall("xMin=\"([^\"]*?)\"",current_line_bbox))
+		# 			yMin = min(re.findall("yMin=\"([^\"]*?)\"",current_line_bbox))
+		# 			xMax = max(re.findall("xMax=\"([^\"]*?)\"",current_line_bbox))
+		# 			yMax = max(re.findall("yMax=\"([^\"]*?)\"",current_line_bbox))
+		# 			print yMin
 
 
 		pass
